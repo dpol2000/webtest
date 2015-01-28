@@ -1,0 +1,114 @@
+﻿{% extends "base2.html" %}
+
+{% block title %}Webtest{% endblock %}
+
+{% block content %}
+
+    {% if  testlog.result < 50 %}<div class="panel panel-danger">{% endif %}
+    {% if  testlog.result >= 50 and testlog.result < 90 %}<div class="panel panel-warning">{% endif %}
+    {% if  testlog.result >= 90 %}<div class="panel panel-success">{% endif %}
+
+        <div class="panel-heading h3">Результат прохождения теста {{testlog.test.name}}</div>
+
+        <div class="panel-body">
+
+        <div class="row">
+          <div class="col-md-6">
+
+        <ul class="list-group">
+            <li class="list-group-item"><span class="badge"><h4>{{ testlog.time|date:"d E Y г. H:i" }}</h4></span><h4>Дата прохождения:</h4></li>
+            <li class="list-group-item"><span class="badge"><h4>{{ testlog.correct_answers }} из {{ testlog.total_questions }}</h4></span><h4>Правильных ответов:<h4></li>
+        </ul>
+
+        </div>
+
+               <div class="col-md-2">
+                    <div style="width: 120px; height: 120px; padding: 20px 0 20px 0; border-radius: 100%"
+    {% if  testlog.result < 50 %}class="danger-bkgnd"{% endif %}
+    {% if  testlog.result >= 50 and testlog.result < 90 %}class="warning-bkgnd"{% endif %}
+    {% if  testlog.result >= 90 %}class="success-bkgnd"{% endif %}        
+                        >
+                        <h1 style="text-align: center;">{{ testlog.result }}%</h1>
+                    </div>
+               </div>
+
+        </div>    
+    
+            <div class="progress">
+                 <div class="progress-bar" role="progressbar" aria-valuenow="{{ testlog.result }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ testlog.result }}%;">{{ testlog.result }}%</div>
+            </div>
+
+        {% if  testlog.result == 100 %} 
+                <img id="manul" src="/static/etest/pics/manul.png" style="display:none; position: fixed; opacity: 0.1; top: 300px; width: 700px">
+
+        <script>
+             $('#manul').css('left', document.documentElement.clientWidth/2 - 350 + 'px');
+             $( "#manul" ).delay(1000).show(0);
+             $( "#manul" ).animate({ "opacity": "+=1" }, 2000 );
+             $( "#manul" ).animate({ "opacity": "-=1" }, 2000 );
+        </script>
+
+        {% endif %}
+
+
+
+           <!-- <div style="text-align: center; float: left; width: 30%; display: inline; border: 3px solid green; background: #77DD77"> -->
+
+            {% for qlog in testlog.get_qlogs %}
+
+            {% if  qlog.result %}
+            <div class="panel panel-success">
+            {% else %}
+            <div class="panel panel-danger">
+            {% endif %}
+
+            <div class="panel-heading">{{ qlog.question.qbody }}</div>
+
+            <div class="panel-body"> 
+
+                {% if qlog.question.qtype == 'Один' or qlog.question.qtype == 'Несколько' %}
+
+                    {% for answer in qlog.question.get_answers %}
+                    <p>
+                    <div class="checkbox">    
+                        <label>
+                        {% if answer.id in qlog.get_alog_answers %} 
+                            {% if qlog.question.qtype == 'Один' %}
+                            <input type="radio" name="question-{{ qlog.question.id }}" value="{{ answer.id }}" disabled checked>
+                            {% elif qlog.question.qtype == 'Несколько' %}
+                            <input type="checkbox" name="question-{{ qlog.question.id }}" value="{{ answer.id }}" disabled checked>
+                            {% endif %}                        
+                        {% else %}
+                            {% if qlog.question.qtype == 'Один' %}
+                            <input type="radio" name="question-{{ qlog.question.id }}" value="{{ answer.id }}" disabled>
+                            {% elif qlog.question.qtype == 'Несколько' %}
+                            <input type="checkbox" name="question-{{ qlog.question.id }}" value="{{ answer.id }}" disabled>
+                            {% endif %}
+                        {% endif %}
+                        {{ answer.body }}
+                        </label>
+                    </div>
+                    </p>
+                    {% endfor %}
+
+                {% elif qlog.question.qtype == 'Свой' %}
+                    {% for alog in qlog.get_alogs %}
+                    <p>
+                    <input type="text" class="form-control" value="{{ alog.answer.body }}" disabled>
+                    </p>    
+                    {% endfor %}
+                {% endif %}
+
+             </div> 
+             </div>
+
+            {% endfor %}
+         </div>
+
+             </div>
+        <button class="btn btn-default" onclick="$('#modalWait').show(); document.location='/students/{{testlog.student.id}}'">Вернуться к списку тестов</button>
+
+    </div>
+
+{% endblock %}
+

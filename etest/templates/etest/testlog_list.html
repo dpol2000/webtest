@@ -1,0 +1,47 @@
+﻿{% extends "base2.html" %}
+
+{% block title %}Webtest{% endblock %}
+
+{% block content %}
+
+     <div class="panel panel-default">
+
+        <div class="panel-heading h3">Результаты прохождения тестов</div>
+
+        <div class="panel-body">
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th align="center" width="180">Пользователь</th>
+                                <th align="center" width="90">Тест</th>
+                                <th align="center" width="40">Результат, %</th>
+                                <th align="center" width="100">Дата</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for testlog in testlogs %}
+                                {% if testlog.result < 50 %}
+                                <tr class="danger">
+                                {% endif %}
+                                {% if testlog.result >= 50 and tl.best_result < 90  %}
+                                <tr class="warning">
+                                {% endif %}
+                                {% if testlog.result >= 90 %}
+                                <tr class="success">
+                                {% endif %}
+                                    <td>{{ testlog.student.user.get_full_name }}</td>
+                                    <td align="left"><a href="/students/results/{{testlog.id}}">{{ testlog.test.name }}</a></td>
+                                    <td align="center">{{ testlog.result }}</td>
+                                    <td align="left">{{ testlog.time|date:"d E Y г. H:i" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>            
+                 </table>
+         </div>
+
+       </div>
+    </div>
+
+{% endblock %}
+

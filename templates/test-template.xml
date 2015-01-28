@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<test name = "{{ test.name }}" anoq="{{ test.actualNumberOfQuestions }}">
+    {% for question in test.questions %}
+        {% if question.qtype == 'Один' %}        
+        <question type="0" content="{{ question.qbody }}">
+        {% elif question.qtype == 'Несколько' %}
+        <question type="1" content="{{ question.qbody }}">
+        {% elif question.qtype == 'Свой' %}
+        <question type="2" content="{{ question.qbody }}">
+        {% endif %}
+        {% for answer in question.answers %}
+            {% if answer.is_correct %}
+            <answer correct="1">{{ answer.body }}</answer>
+            {% elif question.qtype != 'Свой' %}
+            <answer correct="0">{{ answer.body }}</answer>
+             {% endif %}
+            {% endfor %}
+    </question>
+    {% endfor %}
+</test>
+

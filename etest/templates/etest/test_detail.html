@@ -1,0 +1,184 @@
+{% extends "base2.html" %}
+
+{% block title %}Webtest{% endblock %}
+
+{% block content %}
+
+<!--    <form method="post" action="/checktest" onsubmit="return validate();">{% csrf_token %} -->
+
+    <input type="hidden" name="test_id" id="test_id" value="{{test.id}}">
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading h2">{{ test.name }}</div>
+            {% if test.description %}
+            <h4 style="padding-left: 15px"> {{ test.description }} </h4>
+            {% endif %}    
+            <div class="panel-body">
+
+            {% for question in test.get_actual_questions %}
+            <div class="panel panel-default question" id="qp-{{forloop.counter}}" qid="{{ question.id }}">
+                <div class="panel-heading">{{ forloop.counter }}. {{ question.qbody }}</div>
+                <div class="panel-body">
+                {% if question.qtype == 'Один' %}
+                    {% for answer in question.answers %}
+
+                    <div class="radio">    
+                      <label>
+                        <input type="radio" name="question-{{ question.id }}" value="{{ answer.id }}" class="q-{{forloop.parentloop.counter}}" id="a-{{ forloop.counter }}">
+                            {{ answer.body }}
+                        </label>
+                    </div>
+                    {% endfor %}
+
+                {% elif question.qtype == 'Несколько' %}
+                    {% for answer in question.answers %}
+                    <div class="checkbox">    
+                      <label>
+                        <input type="checkbox" name="question-{{ question.id }}" value="{{ answer.id }}" class="q-{{forloop.parentloop.counter}}" id="a-{{ forloop.counter }}">
+                            {{ answer.body }}
+                        </label>
+                    </div>
+                    {% endfor %}
+
+                {% elif question.qtype == 'Свой' %}
+
+                    <input type="text" class="form-control q-{{forloop.counter}}" placeholder="Введите ответ" name="question-{{ question.id }}" id="a-1">
+
+                {% endif %}
+            </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div style="margin: 0 0 20px 20px;">
+            <input type="button" value="Проверить" onclick="validate()">
+        </div>
+        </div>
+    </div>
+    </div>
+<!--    </form> -->
+   
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/static/etest/bootstrap/js/bootstrap.min.js"></script>
+
+    <script>
+    function validate() {
+
+        $('#modalWait').modal('show'); 
+
+        var ok = true;
+
+        for (var i=1; i<=$('.question').length; i++) {
+            
+            var name = '.q-' + i;
+
+            var n;
+
+            if ($(name).attr('type') == 'text') {
+                n = $(name).val().length;
+
+            } else
+                n = $(name + ":checked").length;
+            if (n==0) {
+                if ($(name).length > 1) {
+                    $('#qp-' + i).removeClass('panel-default');
+                    $('#qp-' + i).addClass('panel-danger');
+                    ok = false;
+                }
+                else {
+                    if (!$(name).first().val()) {
+                        $('#qp-' + i).removeClass('panel-default');
+                        $('#qp-' + i).addClass('panel-danger');
+                        ok = false;
+                    }
+                    else {
+                        if ($('#qp-' + i).hasClass('panel-danger')) {
+                            $('#qp-' + i).removeClass('panel-danger');
+                            $('#qp-' + i).addClass('panel-default');
+                        }
+                    }
+                }   
+            }
+            else {
+                $('#qp-' + i).removeClass('panel-danger');
+                $('#qp-' + i).addClass('panel-default');
+
+            }
+
+        }
+
+       if (ok) {
+            GSound.playSound(0);
+            var testData = getTestData();
+            if (testData)
+                sendTestData(testData);
+       }
+        else {
+            GSound.playSound(1);
+            $('#modalWait').modal('hide'); 
+        }
+    
+    };
+
+
+    function getTestData() {
+            var test = { 'id': $('#test_id').val() }
+
+            var questions = [];
+            for (var i=1; i <= $('.question').length; i++) {
+                var answers = [];
+                var question = { id: '', answers: []};
+                question.id = $('#qp-' + i).attr('qid');
+                
+                for (var j=1; j <= $('.q-' + i).length; j++) {
+                    var answer = $('.q-' +i + '#a-' + j)
+                    switch (answer.attr('type')) {
+                        case 'radio':
+                            if (answer.prop('checked') == true) {
+                                answers.push(answer.val());
+                                break;
+                            }
+                            break;
+
+                        case 'checkbox':
+                            if (answer.prop('checked') == true) {
+                                answers.push(answer.val());
+                            }
+                            break;
+
+                        case 'text':
+                            answers.push(answer.val());
+                            console.log(answer.val());
+                            break;
+                    }
+                }
+                question.answers = answers;
+                questions.push(question);
+            }
+            test.questions = questions;
+//            console.log(test);
+            return test;
+
+    }
+
+
+    function sendTestData(testData) {
+            $.post('/checktest_ajax', {'test': JSON.stringify({'test': testData})}, function(data) {
+                document.location = '/students/results/' + data;
+            })
+              .fail(function() {
+                GSound.playSound(2);
+                $('#modalWait').modal('hide');
+                alert( "Возникла ошибка при обработке результатов." );
+              })
+              .always(function() {
+            }, "json");
+    }
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base2.html" %}
+
+{% block title %}Webtest{% endblock %}
+
+{% block content %}
+
+	<div class="panel panel-default">
+
+        <div class="panel-heading h2">Назначенные тесты</div>
+
+        <div class="panel-body">
+
+        {% for ctl in student.get_courses_and_testlogs %}
+            <div class="panel panel-default">
+                <div class="panel-heading h3">{{ ctl.course.name }}</div>
+                <div class="panel-body">
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th width="400">Тест</th>
+                                <th width="50">Пройден, раз</th>
+                                <th width="50">Средний балл, %</th>
+                                <th width="50">Лучший балл, %</th>
+                                <th width="50">Последний балл, %</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tl in ctl.tests_and_testlogs %}
+                            {% if tl.testlogs|length > 0 %}
+                                {% if tl.last_result < 50 %}<tr class="danger">{% endif %}
+                                {% if tl.last_result >= 50 and tl.last_result < 90  %}<tr class="warning">{% endif %}
+                                {% if tl.last_result >= 90 %}<tr class="success">{% endif %}
+                            {% else %}
+                                <tr>
+                            {% endif %}
+                                    <td>{{ tl.test.name }}</td>
+                                    <td align="center">{{ tl.testlogs|length }}</td>
+                                    <td align="center">{{tl.mean_result|floatformat:"0"|default:"-"}}</td>
+                                    <td align="center">{{tl.best_result|default_if_none:"-"}}</td>
+                                    <td align="center">{{tl.last_result|default_if_none:"-"}}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-default" onclick="$('#modalWait').modal({}); document.location='tests/{{tl.test.id}}'"
+                                    {% if user != student.user %}disabled{% endif %}>Пройти тест</button>
+                                    </td>
+                                    {% if tl.testlogs %}
+                                    <td align="center"><button class="btn btn-info showstat">Посмотреть историю >></button></td>
+                                    {% else %}
+                                    <td align="center"></td>
+                                    {% endif %}
+                                </tr>
+                                <tr style="display:none;">
+                                    <td class="table-stat" id="table-stat-{{tl.test.id}}">
+                                    {% if tl.testlogs %}
+                                        <table>
+                                        {% for testlog in tl.testlogs %}
+                                                {% if testlog.result < 50 %}
+                                                    <tr class="danger-bkgnd">
+                                                {% endif %}
+                                                {% if testlog.result >= 50 and testlog.result < 90 %}
+                                                    <tr class="warning-bkgnd">
+                                                {% endif %}
+                                                {% if testlog.result >= 90 %}
+                                                    <tr class="success-bkgnd">
+                                                {% endif %}        
+                                                     <td width="200">{{ forloop.counter }}.&nbsp;{{ testlog.time|date:"d E Y г. H:i" }}</td>
+                                                     <td>{{ testlog.result }}&nbsp;%</td>
+                                                     <td style="background: #FFFFFF"><button class="btn btn-default" style="margin-left: 15px" onclick='document.location="/students/results/{{testlog.id}}"'>Посмотреть</button></td>
+                                            </tr>
+                                        {% endfor %}
+                                        </table>
+                                    {% endif %}                                    
+                                    </td>
+                                </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+   
+                </div>
+            </div>
+       {% endfor %}
+
+        </div>
+
+        </div>
+    </div>
+
+    </div>
+
+<script>
+
+document.body.onload = function () {
+
+//    $( ".showstat" ).parent().parent().next().hide();
+
+};
+
+$( ".showstat" ).click(function() {
+
+    $(this).parent().parent().next().slideToggle(100);
+    var text = $(this).text();
+    $(this).text(
+        text == "Посмотреть историю >>" ? "Убрать историю <<" : "Посмотреть историю >>");
+
+});
+
+</script>
+
+{% endblock %}
+

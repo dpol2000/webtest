@@ -1,0 +1,11 @@
+.success-bkgnd {
+    background: #77DD77;
+}
+
+.warning-bkgnd {
+    background: yellow;
+}
+
+.danger-bkgnd {
+    background: pink;
+}

@@ -1,0 +1,21 @@
+﻿{% extends "base2.html" %}
+
+{% block title %}Webtest{% endblock %}
+
+{% block content %}
+
+	<div class="panel panel-default">
+
+        <div class="panel-heading">Результат загрузки файла {{filename}}</div>
+
+        <div class="panel-body">
+
+        <p>{{ result|safe }}</p>
+
+        </div>
+        <button class="button" onclick="document.location='/admin'">Вернуться к меню администратора</button>
+
+    </div>
+
+{% endblock %}
+
