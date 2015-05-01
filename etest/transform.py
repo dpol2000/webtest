@@ -119,7 +119,8 @@ def uploadxmltest(request):
 
     if 'course' in request.POST:
         course_id = request.POST['course']
-
+    else:
+        course_id = 0
     try:
        c = parseString(data)
     except:
@@ -135,7 +136,10 @@ def uploadxmltest(request):
 
     result = result + '<p>Got a test: name = %s, actual number of questions = %d, description = %s</p>' % (test.name, test.actualNumberOfQuestions, test.description)
 
-    course = Course.objects.get(pk = course_id)
+    if course_id:
+        course = Course.objects.get(pk = course_id)
+    else:
+        course = None
 
     if course:
         from django.db.models import Max

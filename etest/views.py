@@ -158,11 +158,14 @@ def check_ajax(request):
 
                             elif q.qtype == u'Свой':
                                 ans = Answer.objects.filter(question = q, is_correct = True)
-                                answer = ans[0]
 
-                                if normalize(answer.body) == normalize(question['answers'][0]):
-                                    new_answer = answer
-                                else:
+                                new_answer = None
+                                for an in ans:
+                                    if normalize(an.body) == normalize(question['answers'][0]):
+                                        new_answer = an
+                                        break
+
+                                if new_answer is None:
                                     new_answer = Answer(body=question['answers'][0], question = q, is_correct = False)
                                     new_answer.save()
                     
