@@ -28,39 +28,30 @@
 
 
   <div class="site-wrapper">
-
       <div class="site-wrapper-inner">
+          <div class="cover-container">
 
-        <div class="cover-container">
+              <div class="inner cover">
+                  <h1 class="cover-heading">Webtest</h1>
+                  <p class="lead">Система интернет-тестирования</p>
 
-          <div class="inner cover">
-            <h1 class="cover-heading">Webtest</h1>
-            <p class="lead">Система интернет-тестирования</p>
-
-
-         <div class="container">
-                <div class="row">
-                    <div class="col-md-3">
-                        <div id="vk_auth"> </div>
-        			<h3>Вконтакте</h3>
-                     <!-- <script type="text/javascript">VK.Widgets.Auth("vk_auth", {width: "100px", authUrl: 'http://zoss.heliohost.org/webtest/vk'});</script> -->
-                    </div>
-
-            		<div class="col-md-3">
-        			<h3><a href="login-test-student">Демо</a></h3>
-                	</div>
-                </div>
-            </div>
-
-
-
+                  <div class="container">
+                      <div class="row">
+                          <div class="col-md-3">
+                              {% if not local %}
+                              <div id="vk_auth"> </div>
+                              <script type="text/javascript">VK.Widgets.Auth("vk_auth", {width: "100px", authUrl: 'http://dpol.pythonanywhere.com/vk'});</script>
+                              {% endif %}
+                          </div>
+                          <div class="col-md-3">
+                              <button type="button" class="btn btn-primary" onclick="document.location = 'login-test-student'"><h4>Войти как <br/>демо-пользователь</h4></button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
           </div>
-
-        </div>
-
       </div>
-
-    </div>
+  </div>
 
 
 
