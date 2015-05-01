@@ -2,6 +2,7 @@
 
 import datetime
 import json
+import socket
 
 from django.template.response import TemplateResponse
 from django.contrib import auth
@@ -36,12 +37,18 @@ class IndexView(View):
         to index otherwise
         """
 
-        if request.user.is_authenticated(): 
-            if hasattr(request.user, 'student'):
-                if request.user.student:
-                    return redirect(request.user.student) # HttpResponseRedirect('/students/' + str(request.user.student.id))
+        if (socket.gethostbyname(socket.gethostname()) == '127.0.1.1'):
+            local = True
+        else:
+            local = False
 
-        return render(request, self.template_name)
+        if not local:
+            if request.user.is_authenticated():
+                if hasattr(request.user, 'student'):
+                    if request.user.student:
+                        return redirect(request.user.student) # HttpResponseRedirect('/students/' + str(request.user.student.id))
+
+        return render(request, self.template_name, {'local': local})
 
 
 class TestDetailView(DetailView):

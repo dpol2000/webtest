@@ -75,4 +75,4 @@ def authorize(request):
         else:
             return HttpResponse('Login is invalid.')
 
-    return HttpResponse('Login failed, user is disabled .')
+    return HttpResponse('Login failed, user is disabled.')
