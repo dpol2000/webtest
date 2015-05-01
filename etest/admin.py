@@ -1,8 +1,7 @@
+from django import VERSION as django_version
 from django.contrib import admin
 
 from etest.models import Student, Course, Test, Question, Answer, TestLog, QuestionLog, AnswerLog
-
-
 
 class TestInline(admin.TabularInline):
     model = Test
@@ -27,10 +26,15 @@ class CourseAdmin(admin.ModelAdmin):
         extra_context['uploadtitle'] = 'Upload a new test'
         extra_context['uploadcourse'] = object_id
 
-        return super(CourseAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
+        if django_version[1] < 4:
+            return super(CourseAdmin, self).change_view(request, object_id, extra_context=extra_context)
+        else:
+            return super(CourseAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
+
 
 class QuestionInline(admin.TabularInline):
     model = Question
+
 
 class TestAdmin(admin.ModelAdmin):
     inlines = [QuestionInline]
@@ -48,6 +52,7 @@ class TestAdmin(admin.ModelAdmin):
 
 class AnswerInline(admin.TabularInline):
     model = Answer
+
 
 class QuestionAdmin(admin.ModelAdmin):
     inlines = [AnswerInline]
