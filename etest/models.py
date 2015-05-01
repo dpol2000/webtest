@@ -55,7 +55,7 @@ class Course(models.Model):
         return self.name
 
     def XML(self):
-        if django_version[1] < 6:
+        if django_version[1] < 4:
             return mark_safe('<a href="/get_xml?course_id=%s">Сохранить XML</a>' % self.id)
         else:
             return format_html('<a href="/get_xml?course_id=%s">Сохранить XML</a>' % self.id)
@@ -79,7 +79,10 @@ class Test(models.Model):
         return self.name
 
     def XML(self):
-        return format_html('<a href="/get_xml?test_id=%s">Сохранить XML</a>' % self.id)
+        if django_version[1] < 4:
+            return mark_safe('<a href="/get_xml?test_id=%s">Сохранить XML</a>' % self.id)
+        else:
+            return format_html('<a href="/get_xml?test_id=%s">Сохранить XML</a>' % self.id)
 
     XML.allow_tags = True
 
