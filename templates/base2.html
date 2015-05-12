@@ -80,7 +80,8 @@ var interval = setInterval(func, 20000);
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            {% if user.student %} <li><a href="/students/{{user.student.id}}">Тесты</a></li> {% endif %}
+              {% if user.student %} <li><a href="/students/{{user.student.id}}">Тесты</a></li> {% endif %}
+              {% if user.student %} <li><a href="/stats/students/{{user.student.id}}">Статистика</a></li> {% endif %}
             <li><a href="/logout">Выход</a></li>
           </ul>
         </div><!--/.nav-collapse -->
@@ -105,8 +106,8 @@ var interval = setInterval(func, 20000);
     <div class="container">
     <hr>
       <div class="footer">
-        <p>&copy;&nbsp;2014</p>
-        <p>v.1.1</p>
+        <p>&copy;&nbsp;2015</p>
+        <p>v.1.2</p>
       </div>
 
     </div> <!-- /container -->

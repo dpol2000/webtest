@@ -1,0 +1,165 @@
+{% extends "base2.html" %}
+
+{% block title %}Статистика для {{ student }}{% endblock %}
+
+{% block content %}
+
+    <div style="display: none;" id="student_id">{{ student.id }}</div>
+
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+    <script type="text/javascript">
+
+        var options;
+
+        function drawStuff() {
+
+              options = {
+                    animation: {
+                        duration: 100,
+                        easing: 'out'
+                    },
+                    hAxis: {
+                        textStyle:{
+                            fontName: 'Nunito',
+                            fontSize: '12'
+                        }
+                    },
+                    legend: {
+                        position: "none"
+                    },
+                    tooltip: {
+                        trigger: "focus",
+                        textStyle:{
+                            fontName: 'Nunito',
+                            fontSize: '16',
+                        },
+                        isHtml: true
+                    },
+                    bar: {
+                        groupWidth: "90%"
+                    },
+                    vAxis: {
+                        format: '',
+                        minValue: 0,
+                        viewWindowMode: 'maximized',
+                        textStyle: {
+                            fontName: 'Nunito',
+                            fontSize: '16'
+                        },
+                        maxValue: 100
+                    },
+                    height: 500
+                };
+
+                //options.backgroundColor = '#DEFFDE';
+
+                // Create and draw the visualization.
+
+
+            }
+
+        google.load("visualization", "1.1", {packages:["corechart"]});
+        google.setOnLoadCallback(drawStuff);
+
+        $(document).ready(function() {
+
+
+            
+
+            function color_by_grade (grade) {
+
+                if (grade < 50) {
+                    return 'red';
+                }
+
+                if (grade < 90) {
+                    return 'yellow';
+                }
+
+                return 'green';
+            }
+
+
+            $.get('/getstudentdata', {'id': $('div#student_id').text()}, function(data){
+
+                var courses = JSON.parse(data);
+
+                for (var i=0; i!=courses.length; i++) {
+
+                    var avgs = [];
+                    var names = [];
+
+                    for (var j=0; j!=courses[i].tests.length; j++) {
+                        avgs.push(courses[i].tests[j].avg);
+                        names.push(courses[i].tests[j].test);
+                    }
+
+
+                    var sum = 0;
+                    for(var k=0; k < avgs.length; k++) {
+                          sum += avgs[k];
+                    }
+
+                    var res = Math.round(sum/avgs.length);
+
+                    avgs.push(res);
+                    names.push('Итог: ' + res + '%');
+
+                    var datatable = new google.visualization.DataTable();
+                    datatable.addColumn('string', 'N');
+                    datatable.addColumn('number', 'Value');
+                    datatable.addColumn({type: 'string', role: 'style'});
+                    datatable.addColumn({type: 'string', role: 'tooltip'});
+
+                    options.width = 80 * avgs.length;
+
+                    if (options.width > 1000) {
+                        options.width = 1000;
+                    }
+
+
+                    for (var j = 0; j != avgs.length-1; j++) {
+                        datatable.addRow([names[j], 0, 'color: ' + color_by_grade(avgs[j]), names[j] + '\n' + Math.floor(avgs[j]) + '%']);
+                    }
+
+                    datatable.addRow([names[avgs.length-1], 0, 'color: ' + color_by_grade(res), names[avgs.length-1]]);
+
+                    for (var j = 0; j != avgs.length; j++) {
+                        datatable.setValue(j, 1, avgs[j]);
+                    }
+
+                   // $("#course-" + (i + 1) + " #finalscore").text(Math.round(sum / (avgs.length-1)));
+
+                    var chart = new google.visualization.ColumnChart(document.getElementById('canvas' + (i+1)));
+                    chart.draw(datatable, options);
+
+                }
+            });
+
+        });
+    </script>
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading h3">Статистика по тестам</div>
+        <div class="panel-body">
+
+        {% for course in courses %}
+            <div class="panel panel-default" id="course-{{ forloop.counter }}">
+                <div class="panel-heading h3">{{ course.name }}</div>
+                <div class="panel-body">
+                    <div style="width:60%">
+                            <div id="canvas{{ forloop.counter }}" height="800" width="600"></div>
+                    </div>
+<!--                    <div>
+                        <p>Средняя оценка по курсу: <span id="finalscore"></span>%</p>
+                    </div> -->
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}
+

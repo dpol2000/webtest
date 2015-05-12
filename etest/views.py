@@ -4,6 +4,7 @@ import datetime
 import json
 import socket
 
+from django.db import models
 from django.template.response import TemplateResponse
 from django.contrib import auth
 from django.http import HttpResponse, HttpResponseRedirect
@@ -16,6 +17,56 @@ from django.views.decorators.http import last_modified, require_GET, require_POS
 
 from models import Student, Test, Question, Answer, TestLog, QuestionLog, AnswerLog
 
+class StudentStatsView(DetailView):
+    """ A particular test statistics view """
+    context_object_name = 'student'
+    queryset = Student.objects.all()
+    template_name = 'etest/student_stats.html'
+
+    def get(self, request, *args, **kwargs):
+
+        self.object = self.get_object()
+        context = self.get_context_data()
+
+        context['courses'] = self.object.courses.all()
+
+        return self.render_to_response(context)
+
+
+@csrf_exempt
+def getstudentdata(request):
+
+    id = int(request.GET['id'])
+    student = Student.objects.get(id=id)
+    courses = []
+
+    for course in student.courses.all():
+        crs = {'course': course.name, 'tests': []}
+        for test in course.test_set.all():
+            tst = {'test': test.name,
+                   'avg': TestLog.objects.filter(test=test, student = student).aggregate(models.Avg('result'))['result__avg']}
+            crs['tests'].append(tst)
+
+        courses.append(crs)
+
+    return HttpResponse(json.dumps(courses))
+
+
+class TestStatsView(DetailView):
+    """ A particular student statistics view """
+    context_object_name = 'test'
+    queryset = Test.objects.all()
+    template_name = 'etest/test_stats.html'
+
+    def get(self, request, *args, **kwargs):
+
+        self.object = self.get_object()
+        context = self.get_context_data()
+
+        context['testlogs'] = TestLog.objects.filter(test = self.object)
+
+        return self.render_to_response(context)
+
         
 class StudentDetailView(DetailView):
     context_object_name = 'student'
@@ -26,7 +77,6 @@ class TestLogDetailView(DetailView):
     queryset = TestLog.objects.all()
 
 class IndexView(View):
-    
     """ The index view """
     
     template_name = 'index.html'
@@ -84,13 +134,26 @@ def logout(request):
     """ Logs the user out """
     if request.user.is_authenticated():
         auth.logout(request)
-        return HttpResponseRedirect('/')
+    return HttpResponseRedirect('/')
 
 
 def normalize(string):
     """ Deletes spaces and uppercases the string """
-    return string.replace(" ", "").upper()
+    if string[-1] == '.':
+        string2 = string[:-1]
+    else:
+        string2 = string
+    return string2.replace(" ", "").upper()
 
+@csrf_exempt
+def getdata(request):
+
+    test = Test.objects.get(id=23)
+    testlogs = TestLog.objects.filter(test=test)
+
+    results = [testlog.result for testlog in testlogs if testlog.result != None]
+
+    return HttpResponse(results)
 
 @csrf_exempt
 def check_ajax(request):

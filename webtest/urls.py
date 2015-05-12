@@ -9,7 +9,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', include('etest.urls')), 
+    url(r'^', include('etest.urls')),
     url(r'^login-test-student$', 'etest.views.lts'),
     url(r'^logout$', 'etest.views.logout'),
     url(r'^checktest$', 'etest.views.check'),
@@ -20,4 +20,5 @@ urlpatterns = patterns('',
     url(r'^uploadtest$', 'etest.transform.uploadxmltest'),
     url(r'^get_xml$', 'etest.transform.get_xml'),
     url(r'^vk.*$', 'etest.vk.authorize'),
+    url(r'^getstudentdata$', 'etest.views.getstudentdata'),
 )

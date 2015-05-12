@@ -36,12 +36,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'etest',
-    'debug_toolbar'
+    'etest'
+    #'debug_toolbar'
 )
 
 MIDDLEWARE_CLASSES = (
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -65,8 +64,8 @@ DATABASES = {
         'NAME': 'webtest',
         'USER': 'root',
         'PASSWORD': 'root',
-        'HOST': '127.0.0.1',
-        'PORT': '5432'
+        'HOST': '127.0.0.1'
+        #'PORT': '5432'
     }
 }
 
@@ -89,9 +88,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = '/home/ignis/Projects/webtest3/staticfiles/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
     "/usr/local/lib/python2.7/dist-packages/django/contrib/admin/static/admin/",
 )
 
