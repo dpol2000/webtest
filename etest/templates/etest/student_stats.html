@@ -64,8 +64,7 @@
 
         $(document).ready(function() {
 
-
-            
+            $('#modalWait').modal('show');
 
             function color_by_grade (grade) {
 
@@ -85,14 +84,18 @@
 
                 var courses = JSON.parse(data);
 
+                $('#modalWait').modal('hide');
+
                 for (var i=0; i!=courses.length; i++) {
 
                     var avgs = [];
                     var names = [];
+                    var counts = [];
 
                     for (var j=0; j!=courses[i].tests.length; j++) {
                         avgs.push(courses[i].tests[j].avg);
                         names.push(courses[i].tests[j].test);
+                        counts.push(courses[i].tests[j].count);
                     }
 
 
@@ -120,7 +123,8 @@
 
 
                     for (var j = 0; j != avgs.length-1; j++) {
-                        datatable.addRow([names[j], 0, 'color: ' + color_by_grade(avgs[j]), names[j] + '\n' + Math.floor(avgs[j]) + '%']);
+                        datatable.addRow([names[j], 0, 'color: ' + color_by_grade(avgs[j]), names[j] + '\n' +
+                        Math.floor(avgs[j]) + '%\nПройден ' + counts[j] + ' раз(а)']);
                     }
 
                     datatable.addRow([names[avgs.length-1], 0, 'color: ' + color_by_grade(res), names[avgs.length-1]]);

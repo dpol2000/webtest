@@ -44,7 +44,8 @@ def getstudentdata(request):
         crs = {'course': course.name, 'tests': []}
         for test in course.test_set.all():
             tst = {'test': test.name,
-                   'avg': TestLog.objects.filter(test=test, student = student).aggregate(models.Avg('result'))['result__avg']}
+                   'avg': TestLog.objects.filter(test=test, student=student).aggregate(models.Avg('result'))['result__avg'],
+                   'count': TestLog.objects.filter(test=test, student=student).count()}
             crs['tests'].append(tst)
 
         courses.append(crs)
