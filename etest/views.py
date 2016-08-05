@@ -15,6 +15,7 @@ from django.views.generic import DetailView, ListView, View
 from django.views.decorators.http import last_modified, require_GET, require_POST
 
 from models import Student, Test, Question, Answer, TestLog, QuestionLog, AnswerLog
+from utils import normalize
 
 
 class StudentStatsView(DetailView):
@@ -24,7 +25,6 @@ class StudentStatsView(DetailView):
     template_name = 'etest/student_stats.html'
 
     def get(self, request, *args, **kwargs):
-
         self.object = self.get_object()
         context = self.get_context_data()
         context['courses'] = self.object.courses.all()
@@ -34,8 +34,8 @@ class StudentStatsView(DetailView):
 @csrf_exempt
 def getstudentdata(request):
 
-    id = int(request.GET['id'])
-    student = Student.objects.get(id=id)
+    student_id = int(request.GET['id'])
+    student = Student.objects.get(id=student_id)
     courses = []
 
     for course in student.courses.all():
@@ -107,6 +107,7 @@ class TestDetailView(DetailView):
     context_object_name = 'test'
     queryset = Test.objects.all()
 
+
 class TestLogList(ListView):
     
     """ List of testlogs, for admin """
@@ -137,23 +138,12 @@ def logout(request):
     return HttpResponseRedirect('/')
 
 
-def normalize(string):
-    """ Deletes spaces and uppercases the string """
-    if string[-1] == '.':
-        string2 = string[:-1]
-    else:
-        string2 = string
-    return string2.replace(" ", "").upper()
-
-
 @csrf_exempt
 def getdata(request):
 
     test = Test.objects.get(id=23)
     testlogs = TestLog.objects.filter(test=test)
-
-    results = [testlog.result for testlog in testlogs if testlog.result != None]
-
+    results = [testlog.result for testlog in testlogs if testlog.result is not None]
     return HttpResponse(results)
 
 
@@ -172,10 +162,11 @@ def check_ajax(request):
                 try:
                     
                     # find test object
-                    t = Test.objects.get(pk = int(test['test']['id']))
+                    t = Test.objects.get(pk=int(test['test']['id']))
 
                     # create and save test log
-                    tlog = TestLog(test=t, student=Student.objects.get(user=request.user), total_questions = t.actualNumberOfQuestions, correct_answers = 0)
+                    tlog = TestLog(test=t, student=Student.objects.get(user=request.user),
+                                   total_questions=t.actualNumberOfQuestions, correct_answers=0)
                     tlog.save()
 
                 except: 
@@ -186,7 +177,7 @@ def check_ajax(request):
                     questions = test['test']['questions']
                     for question in questions:
                         try:
-                            q = Question.objects.get(pk = int(question['id']))
+                            q = Question.objects.get(pk=int(question['id']))
                         except: 
                             pass
                         else:
@@ -210,7 +201,7 @@ def check_ajax(request):
 
                                 for answer in answers:
                                     if not answer.is_correct:
-                                        all_correct  = False
+                                        all_correct = False
                                     alog = AnswerLog(qlog=qlog, answer=answer)
                                     alog.save()
  
@@ -219,7 +210,6 @@ def check_ajax(request):
                                 if all_correct and len(answers) == correct_answers.count():
                                     qlog.result = True
                                     true_answers = true_answers + 1
-
 
                             elif q.qtype == u'Свой':
                                 ans = Answer.objects.filter(question=q, is_correct=True)
@@ -244,7 +234,7 @@ def check_ajax(request):
                                 qlog.save()
 
                     tlog.correct_answers = true_answers
-                    tlog.result = 100* tlog.correct_answers / tlog.total_questions
+                    tlog.result = 100 * tlog.correct_answers / tlog.total_questions
                     tlog.save()
 
                     return HttpResponse(str(tlog.id))
@@ -284,17 +274,6 @@ def lts(request):
     return redirect(student) # HttpResponseRedirect('/students/' + str(student.id))
 
 
-@csrf_exempt
-def croco(request):
-    """ Delete the croco """
-    if request.is_ajax() and request.method == 'POST' and request.user.is_authenticated():
-        student = request.user.student
-        if student:
-            student.croco = False
-            student.save()
-    return HttpResponse('ok')
-
-
 @require_POST
 def check(request):
     """ Check the test. Old version, not in use now """
@@ -309,7 +288,8 @@ def check(request):
                     true_answers = 0
                     questions = Question.objects.filter(test=test)
 
-                    tlog = TestLog(test=test, student=Student.objects.get(user=request.user), total_questions = test.actualNumberOfQuestions, correct_answers = 0)
+                    tlog = TestLog(test=test, student=Student.objects.get(user=request.user),
+                                   total_questions=test.actualNumberOfQuestions, correct_answers=0)
                     tlog.save()
 
                     qlog = None
@@ -332,7 +312,6 @@ def check(request):
                                     qlog.result = True                
                                     true_answers = true_answers + 1
 
-            
                             elif question.qtype == u'Несколько':
 
                                 answers_id_list = request.POST.getlist('question-'+str(question.id), -1)
@@ -355,7 +334,6 @@ def check(request):
                                     qlog.result = True
                                     true_answers = true_answers + 1
 
-
                             elif question.qtype == u'Свой':
                                 ans = Answer.objects.filter(question=question, is_correct=True)
                                 answer = ans[0]
@@ -363,7 +341,8 @@ def check(request):
                                 if answer.body == request.POST['question-'+str(question.id)]:
                                     new_answer = answer
                                 else:
-                                    new_answer = Answer(body=request.POST['question-' + str(question.id)], question = question, is_correct = False)
+                                    new_answer = Answer(body=request.POST['question-' + str(question.id)],
+                                                        question=question, is_correct=False)
                                     new_answer.save()
                     
                                 alog = AnswerLog(qlog=qlog, answer=new_answer)
@@ -378,7 +357,7 @@ def check(request):
                             qlogs.append(qlog)
             
                         tlog.correct_answers = true_answers
-                        tlog.total_questions = test.actualNumberOfQuestions #Question.objects.filter(test=test).count()
+                        tlog.total_questions = test.actualNumberOfQuestions
                         tlog.result = 100* tlog.correct_answers / tlog.total_questions
                         tlog.save()
 
