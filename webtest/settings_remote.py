@@ -12,6 +12,6 @@ MEDIA_ROOT = '/home/dpol/webtest/media/'
 
 STATIC_ROOT = '/home/dpol/webtest/staticfiles/'
 STATICFILES_DIRS = (
-    '/home/dpol/webtest/static/',
+    # '/home/dpol/webtest/static/',
     #"/usr/local/lib/python2.7/dist-packages/django/contrib/admin/static/admin/",
 )
