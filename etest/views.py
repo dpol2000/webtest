@@ -86,7 +86,7 @@ class IndexView(View):
         to index otherwise
         """
 
-        if (socket.gethostbyname(socket.gethostname()) == '127.0.1.1'):
+        if socket.gethostname() == 'hrutr':
             local = True
         else:
             local = False
