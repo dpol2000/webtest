@@ -28,39 +28,6 @@
 
 GSound.init();
 
-{% if user.student.croco %}
-
-function func() {
-    $( "#croco" ).animate({ "left": "-=350px" }, 2000 ).delay(1500).animate({ "left": "+=350px" }, 2000 ); 
-}
-
-function offCroco() {
-
-    if (confirm('Do you want to kill the poor croco?')) {
-       GSound.playSound(2);
-       $( "#croco" ).animate({ "left": "+=350px" }, 800 ); 
-       clearInterval(interval);
-
-        $.post('/croco', function(data) {
-            alert('You will not see the croco again...');
-        })
-          .fail(function() {
-                console.log( "Ошибка на сервере" );
-              })
-              .always(function() {
-            });
-
-    }
-    else {
-        alert('Thank you!');
-    }
-    
-}
-
-var interval = setInterval(func, 20000);
-
-{% endif %}
-
 </script>
 
 <style>
@@ -88,14 +55,6 @@ var interval = setInterval(func, 20000);
       </div>
     </div>
     
-
-{% if user.student.croco %}<img id="croco" src="/static/etest/pics/croco99.png" alt="" height="400" style="position: fixed; top: 400px" onclick="offCroco();">
-
-<script>
-    $('#croco').css('left', document.documentElement.clientWidth + 'px');
-    // тургенева 159 50 9 эт.
-</script>
-{% endif %}
 
     <div class="container">
 
@@ -128,4 +87,3 @@ var interval = setInterval(func, 20000);
 
   </body>
 </html>
-
