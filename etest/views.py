@@ -27,9 +27,7 @@ class StudentStatsView(DetailView):
 
         self.object = self.get_object()
         context = self.get_context_data()
-
         context['courses'] = self.object.courses.all()
-
         return self.render_to_response(context)
 
 
@@ -63,9 +61,7 @@ class TestStatsView(DetailView):
 
         self.object = self.get_object()
         context = self.get_context_data()
-
-        context['testlogs'] = TestLog.objects.filter(test = self.object)
-
+        context['testlogs'] = TestLog.objects.filter(test=self.object)
         return self.render_to_response(context)
 
         
@@ -189,13 +185,13 @@ def check_ajax(request):
                         except: 
                             pass
                         else:
-                            qlog = QuestionLog(question = q, tlog = tlog, result = False)
+                            qlog = QuestionLog(question=q, tlog=tlog, result=False)
                             qlog.save()
 
                             if q.qtype == u'Один':
 
-                                answer = Answer.objects.get(pk = int(question['answers'][0]))
-                                alog = AnswerLog(qlog = qlog, answer = answer)                    
+                                answer = Answer.objects.get(pk=int(question['answers'][0]))
+                                alog = AnswerLog(qlog=qlog, answer=answer)
                                 alog.save()
                                 if answer.is_correct:
                                     qlog.result = True                
@@ -210,10 +206,10 @@ def check_ajax(request):
                                 for answer in answers:
                                     if not answer.is_correct:
                                         all_correct  = False
-                                    alog = AnswerLog(qlog = qlog, answer = answer)
+                                    alog = AnswerLog(qlog=qlog, answer=answer)
                                     alog.save()
  
-                                correct_answers = Answer.objects.filter(question = q, is_correct = True)
+                                correct_answers = Answer.objects.filter(question=q, is_correct=True)
                              
                                 if all_correct and len(answers) == correct_answers.count():
                                     qlog.result = True
@@ -221,7 +217,7 @@ def check_ajax(request):
 
 
                             elif q.qtype == u'Свой':
-                                ans = Answer.objects.filter(question = q, is_correct = True)
+                                ans = Answer.objects.filter(question=q, is_correct=True)
 
                                 new_answer = None
                                 for an in ans:
@@ -230,10 +226,10 @@ def check_ajax(request):
                                         break
 
                                 if new_answer is None:
-                                    new_answer = Answer(body=question['answers'][0], question = q, is_correct = False)
+                                    new_answer = Answer(body=question['answers'][0], question=q, is_correct=False)
                                     new_answer.save()
                     
-                                alog = AnswerLog(qlog = qlog, answer = new_answer)
+                                alog = AnswerLog(qlog=qlog, answer=new_answer)
                                 alog.save()
                                 if new_answer.is_correct:
                                     qlog.result = True                
@@ -272,7 +268,7 @@ def lts(request):
         user.save()
         student.save()
     else:
-        student = Student.objects.get(user = user.id)
+        student = Student.objects.get(user=user.id)
 
     student.facebook_id = '123'
     student.save()
@@ -300,7 +296,7 @@ def check(request):
             if 'test_id' in request.POST:
                 test_id = int(request.POST['test_id'])
                 if test_id:
-                    test = Test.objects.get(pk = test_id)
+                    test = Test.objects.get(pk=test_id)
                     qlogs = []
                     alogs = []
                     true_answers = 0
@@ -314,14 +310,14 @@ def check(request):
 
                         if 'question-'+str(question.id) in request.POST:
 
-                            qlog = QuestionLog(question = question, tlog = tlog, result = False)
+                            qlog = QuestionLog(question=question, tlog=tlog, result=False)
                             qlog.save()
 
                             if question.qtype == u'Один':
 
                                 answer_id = int(request.POST['question-'+str(question.id)])
-                                answer = Answer.objects.get(pk = answer_id)
-                                alog = AnswerLog(qlog = qlog, answer = answer)                    
+                                answer = Answer.objects.get(pk=answer_id)
+                                alog = AnswerLog(qlog=qlog, answer=answer)
                                 alog.save()
     
                                 alogs.append(alog)
@@ -332,13 +328,8 @@ def check(request):
             
                             elif question.qtype == u'Несколько':
 
-
-                                if django_version[1] < 4:
-                                    answers_id_list = request.POST.getlist('question-'+str(question.id))
-                                else:
-                                    answers_id_list = request.POST.getlist('question-'+str(question.id), -1)
-
-                                answers = [Answer.objects.get(pk = x) for x in answers_id_list]
+                                answers_id_list = request.POST.getlist('question-'+str(question.id), -1)
+                                answers = [Answer.objects.get(pk=x) for x in answers_id_list]
                                           
                                 true_flag = True
                                 count = 0 
@@ -346,12 +337,12 @@ def check(request):
                                 for answer in answers:
                                     if answer.is_correct == False:
                                         true_flag = False
-                                    alog = AnswerLog(qlog = qlog, answer = answer)
+                                    alog = AnswerLog(qlog=qlog, answer=answer)
                                     alog.save()
                                     alogs.append(alog)
                                     count = count + 1
  
-                                correct_answers = Answer.objects.filter(question = question, is_correct = True)
+                                correct_answers = Answer.objects.filter(question=question, is_correct=True)
                              
                                 if true_flag and count == correct_answers.count():
                                     qlog.result = True
@@ -359,7 +350,7 @@ def check(request):
 
 
                             elif question.qtype == u'Свой':
-                                ans = Answer.objects.filter(question = question, is_correct = True)
+                                ans = Answer.objects.filter(question=question, is_correct=True)
                                 answer = ans[0]
 
                                 if answer.body == request.POST['question-'+str(question.id)]:
@@ -368,7 +359,7 @@ def check(request):
                                     new_answer = Answer(body=request.POST['question-' + str(question.id)], question = question, is_correct = False)
                                     new_answer.save()
                     
-                                alog = AnswerLog(qlog = qlog, answer = new_answer)
+                                alog = AnswerLog(qlog=qlog, answer=new_answer)
                                 alog.save()
                                 alogs.append(alog)
                                 if new_answer.is_correct:

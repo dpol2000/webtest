@@ -39,10 +39,10 @@ def get_xml(request):
         except:
             return HttpResponse("error 1")
 
-        test.questions = list(Question.objects.filter(test = test))
+        test.questions = list(Question.objects.filter(test=test))
 
         for q in test.questions:
-            q.answers = list(Answer.objects.filter(question = q))
+            q.answers = list(Answer.objects.filter(question=q))
 
         response = TemplateResponse(request, 'test-template.xml', { 'test': test }, 'application/x-generated-xml-backup')
 
@@ -97,9 +97,7 @@ def serialize_ajax(request):
             return HttpResponse('exception')
 #        if courses:
             #course = courses[0]
-
-#            return HttpResponse('error in id')        
-
+#            return HttpResponse('error in id')
 #            data = serializers.serialize("xml", course)
 
         return HttpResponse('ok')
@@ -111,9 +109,7 @@ def serializecourse(request):
 
     if 'course' in request.POST:
         course_id = request.POST['course']
-
-        data = serializers.serialize("xml", Course.objects.get(id = course_id))
-
+        data = serializers.serialize("xml", Course.objects.get(id=course_id))
         return HttpResponse('ok')
     else:
         return HttpResponse('error')
@@ -122,9 +118,7 @@ def serializetest(request):
 
     if 'test' in request.POST:
         test_id = request.POST['test']
-
-        data = serializers.serialize("xml", Course.objects.get(id = test_id))
-
+        data = serializers.serialize("xml", Course.objects.get(id=test_id))
         return HttpResponse(data)
     else:
         return HttpResponse('error')

@@ -6,7 +6,6 @@ from models import Course, Student, Test, Question, Answer
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template.response import TemplateResponse
-
 from django.views.decorators.http import require_GET, require_POST
 
 @require_GET
@@ -21,12 +20,12 @@ def get_xml(request):
         except:
             return HttpResponse("Error: no course with such id: %i" % course_id)
 
-        course.tests = list(Test.objects.filter(course = course))
+        course.tests = list(Test.objects.filter(course=course))
 
         for test in course.tests: 
-            test.questions = list(Question.objects.filter(test = test))
+            test.questions = list(Question.objects.filter(test=test))
             for q in test.questions:
-                q.answers = list(Answer.objects.filter(question = q))
+                q.answers = list(Answer.objects.filter(question=q))
 
         response = TemplateResponse(request, 'course-template.xml', { 'course': course }, 'application/x-generated-xml-backup')
 
@@ -42,12 +41,12 @@ def get_xml(request):
         except:
             return HttpResponse("Error: no test with such id: %i" % test_id)
 
-        test.questions = list(Question.objects.filter(test = test))
+        test.questions = list(Question.objects.filter(test=test))
 
         for q in test.questions:
-            q.answers = list(Answer.objects.filter(question = q))
+            q.answers = list(Answer.objects.filter(question=q))
 
-        response = TemplateResponse(request, 'test-template.xml', { 'test': test }, 'application/x-generated-xml-backup')
+        response = TemplateResponse(request, 'test-template.xml', {'test': test}, 'application/x-generated-xml-backup')
 
         response['Content-disposition'] = 'attachment; filename=test-' + str(test_id) + '.xml'
 
@@ -55,8 +54,7 @@ def get_xml(request):
     
     return HttpResponse("error")
 
-
-def parseXMLanswer(xmlanswer, question, position = 0):
+def parseXMLanswer(xmlanswer, question, position=0):
 
     correct_str = xmlanswer.getAttribute('correct')
     if correct_str == '1':
@@ -64,13 +62,11 @@ def parseXMLanswer(xmlanswer, question, position = 0):
     else:
         correct = False
     body = xmlanswer.firstChild.nodeValue
-    answer = Answer(body = body, position = position, question = question, is_correct = correct)
+    answer = Answer(body=body, position=position, question=question, is_correct=correct)
     answer.save()
-
     return answer
 
-def parseXMLquestion(xmlquestion, test, position = 0):
-
+def parseXMLquestion(xmlquestion, test, position=0):
     qbody = xmlquestion.getAttribute('content')
     qtype = xmlquestion.getAttribute('type')
     questionType = None
@@ -80,30 +76,26 @@ def parseXMLquestion(xmlquestion, test, position = 0):
         questionType = u'Несколько'
     elif qtype == '2':
         questionType = u'Свой'
-    question = Question(qbody = qbody, position = position, test = test, qtype = questionType)
+    question = Question(qbody=qbody, position=position, test=test, qtype=questionType)
     question.save()
-
     return question
 
-
-def parseXMLtest(xmltest, user, course = None, num = 0):
+def parseXMLtest(xmltest, user, course=None, num=0):
     testName = xmltest.getAttribute('name')
     desc = xmltest.getAttribute('desc')
     anoq = int(xmltest.getAttribute('anoq'))
-    test = Test(name = testName, position = num, description = desc, author = user, course = course, actualNumberOfQuestions = anoq, totalNumberOfQuestions = anoq)
+    test = Test(name=testName, position=num, description=desc, author=user, course=course, actualNumberOfQuestions=anoq,
+                totalNumberOfQuestions=anoq)
     test.save()
-
     return test
 
 def uploadfile(request, filename):
     """ Returns data from request file """
-
     try:
         datafile = request.FILES[filename]
         data = datafile.read(datafile.size)
     except:
         return None
-
     return data
 
 @require_POST
@@ -191,7 +183,7 @@ def uploadxmlcourse(request):
         error = 'XML parsing error 2'
         return HttpResponse(error)
 
-    course_obj = Course(name = cname, author = request.user)
+    course_obj = Course(name=cname, author=request.user)
     result = result + '<p>Got course: %s\n</p>' % cname
     course_obj.save()
 
@@ -220,10 +212,8 @@ def uploadxmlcourse(request):
             test.totalNumberOfQuestions = j
         test.save()
 
-
 #    return HttpResponseRedirect('/admin')
     return TemplateResponse(request, 'upload.html', {'result': result})
-
 
 # outdated!
 def upload(request):
@@ -232,9 +222,7 @@ def upload(request):
     import json
 
     coursefile = request.FILES['course']
-    
     data = coursefile.read(coursefile.size)
-
     buf = StringIO.StringIO(data)
 
     cname = str(buf.readline()).decode('utf8')[:-1]
@@ -267,7 +255,7 @@ def upload(request):
             if fstr != 'question\n':
                 if fstr == 'test\n':
                     break
-                elif fstr == '\n' or fstr=='':
+                elif fstr == '\n' or fstr == '':
                     break        
                 else:    
                     return HttpResponse('question: ' + fstr)
@@ -296,7 +284,7 @@ def upload(request):
 
             questions.append({'qbody': question, 'qtype': qtype, 'answers': answers})
 
-            if fstr=='':
+            if fstr == '':
                 break
 
         tests.append({'name': tname, 'questions': questions})
@@ -306,21 +294,21 @@ def upload(request):
 #    kkd = json.dumps(course, indent=4, separators=(',', ': '))
 #    return HttpResponse(kkd)
 
-    course_obj = Course(name = course['course'], author = request.user)
+    course_obj = Course(name=course['course'], author=request.user)
     tests_obj = []
     questions_obj = []
     answers_obj = []
-    i=0
+    i = 0
 
     course_obj.save()
 
     for test in course['tests']:
-        i=i+1
-        test_obj = Test(name = test['name'], position = i, author = request.user, course = course_obj, actualNumberOfQuestions = len(test['questions']), totalNumberOfQuestions = len(test['questions']))
+        i = i + 1
+        test_obj = Test(name=test['name'], position=i, author=request.user, course=course_obj, actualNumberOfQuestions=len(test['questions']), totalNumberOfQuestions=len(test['questions']))
         test_obj.save()
-        j=0
+        j = 0
         for question in test['questions']:
-            j=j+1
+            j = j + 1
             if question['qtype'] == 0:
                 qqq = u'Один'
             elif question['qtype'] == 1:
@@ -330,13 +318,12 @@ def upload(request):
             else:
                 return HttpResponse('error with qtype')
 
-            question_obj = Question(qbody = question['qbody'], position = j, test = test_obj, qtype = qqq)
+            question_obj = Question(qbody=question['qbody'], position=j, test=test_obj, qtype=qqq)
             question_obj.save()
-            k=0
+            k = 0
             for answer in question['answers']:
-                k=k+1
-                answer_obj = Answer(body = answer['body'], position = k, question = question_obj, is_correct = answer['correct'])
+                k= k + 1
+                answer_obj = Answer(body=answer['body'], position=k, question=question_obj, is_correct=answer['correct'])
                 answer_obj.save()
 
     return HttpResponse('ok')
-

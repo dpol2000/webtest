@@ -4,15 +4,30 @@
 
 {% block content %}
 
-    <div style="display: none;" id="student_id">{{ student.id }}</div>
-
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
     <script type="text/javascript">
 
         var options;
 
-        function drawStuff() {
+        google.load("visualization", "1.1", {packages:["corechart"]});
+//        google.setOnLoadCallback(drawStuff);
+
+
+//        function drawStuff() {
+
+
+                //options.backgroundColor = '#DEFFDE';
+
+                // Create and draw the visualization.
+
+
+//            }
+
+        $(function(){
+
+//        $(document).ready(function() {
+
 
               options = {
                     animation: {
@@ -21,48 +36,44 @@
                     },
                     hAxis: {
                         textStyle:{
-                            fontName: 'Nunito',
+//                            fontName: 'Nunito',
                             fontSize: '12'
                         }
                     },
+
                     legend: {
                         position: "none"
                     },
+
                     tooltip: {
                         trigger: "focus",
                         textStyle:{
-                            fontName: 'Nunito',
-                            fontSize: '16',
+//                            fontName: 'Nunito',
+                            fontSize: '16'
                         },
                         isHtml: true
                     },
+
                     bar: {
                         groupWidth: "90%"
                     },
+
                     vAxis: {
                         format: '',
                         minValue: 0,
                         viewWindowMode: 'maximized',
                         textStyle: {
-                            fontName: 'Nunito',
+//                            fontName: 'Nunito',
                             fontSize: '16'
                         },
                         maxValue: 100
                     },
+
                     height: 500
                 };
 
-                //options.backgroundColor = '#DEFFDE';
 
-                // Create and draw the visualization.
-
-
-            }
-
-        google.load("visualization", "1.1", {packages:["corechart"]});
-        google.setOnLoadCallback(drawStuff);
-
-        $(document).ready(function() {
+            $.ajaxSetup({ cache: false });
 
             $('#modalWait').modal('show');
 
@@ -80,7 +91,9 @@
             }
 
 
-            $.get('/getstudentdata', {'id': $('div#student_id').text()}, function(data){
+//            drawStuff();
+
+            $.get('/getstudentdata', {'id': '{{ student.id }}'}, function(data){
 
                 var courses = JSON.parse(data);
 
@@ -97,7 +110,6 @@
                         names.push(courses[i].tests[j].test);
                         counts.push(courses[i].tests[j].count);
                     }
-
 
                     var sum = 0;
                     for(var k=0; k < avgs.length; k++) {
@@ -121,8 +133,8 @@
                         options.width = 1000;
                     }
 
-
                     for (var j = 0; j != avgs.length-1; j++) {
+
                         datatable.addRow([names[j], 0, 'color: ' + color_by_grade(avgs[j]), names[j] + '\n' +
                         Math.floor(avgs[j]) + '%\nПройден ' + counts[j] + ' раз(а)']);
                     }
@@ -136,6 +148,10 @@
                    // $("#course-" + (i + 1) + " #finalscore").text(Math.round(sum / (avgs.length-1)));
 
                     var chart = new google.visualization.ColumnChart(document.getElementById('canvas' + (i+1)));
+
+//                    console.log(datatable);
+//                    console.log(options);
+
                     chart.draw(datatable, options);
 
                 }

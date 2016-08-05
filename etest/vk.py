@@ -55,12 +55,11 @@ def authorize(request):
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         user.save()
 
-        student = Student(user = user, facebook_id = '123')
+        student = Student(user=user, facebook_id='123')
         student.save()
 
-
     else:
-        student = Student.objects.get(user = user.id)
+        student = Student.objects.get(user=user.id)
         if not student.photo:
             student.photo = photo
             student.save()

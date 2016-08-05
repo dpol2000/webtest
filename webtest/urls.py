@@ -1,9 +1,4 @@
-from django import VERSION as django_version
-
-if django_version[1] < 4:
-    from django.conf.urls.defaults import patterns, include, url
-else:
-    from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
 admin.autodiscover()

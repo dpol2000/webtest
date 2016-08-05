@@ -1,33 +1,12 @@
-"""
-Django settings for webtest project.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/1.6/topics/settings/
-
-For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.6/ref/settings/
-"""
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import socket
+from config import get_config, get_config_key
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'blbk5&vdp6lud%u)*zhxj88tjtac@ia=qrvesevxuw_8+#9!h_'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-TEMPLATE_DEBUG = True
-
-ALLOWED_HOSTS = []
-
-
-# Application definition
+config_keys = get_config()
+SECRET_KEY = get_config_key("SECRET_KEY", config_keys)
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -54,23 +33,10 @@ ROOT_URLCONF = 'webtest.urls'
 
 WSGI_APPLICATION = 'webtest.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'webtest',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': '127.0.0.1'
-        #'PORT': '5432'
-    }
-}
-
-# Internationalization
-# https://docs.djangoproject.com/en/1.6/topics/i18n/
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+    "/usr/local/lib/python2.7/dist-packages/django/contrib/admin/static/admin/",
+)
 
 LANGUAGE_CODE = 'ru-ru'
 
@@ -82,21 +48,37 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.6/howto/static-files/
-
-STATIC_URL = '/static/'
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-    "/usr/local/lib/python2.7/dist-packages/django/contrib/admin/static/admin/",
-)
-
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
 TEMPLATE_LOADERS = (
-'django.template.loaders.filesystem.Loader',
- 'django.template.loaders.app_directories.Loader')
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader')
+
+if socket.gethostbyaddr(socket.gethostname())[2][0] == '127.0.1.1':
+    from settings_local import *
+
+    db_name = get_config_key("DB_NAME_LOCAL", config_keys)
+    db_user = get_config_key("DB_USER_LOCAL", config_keys)
+    db_password = get_config_key("DB_PASSWORD_LOCAL", config_keys)
+    db_host = ""
+
+else:
+    from settings_remote import *
+
+    db_name = get_config_key("DB_NAME_REMOTE", config_keys)
+    db_user = get_config_key("DB_USER_REMOTE", config_keys)
+    db_password = get_config_key("DB_PASSWORD_REMOTE", config_keys)
+    db_host = get_config_key("DB_HOST_REMOTE", config_keys)
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': db_name,                      # Or path to database file if using sqlite3.
+        'USER': db_user,                      # Not used with sqlite3.
+        'PASSWORD': db_password,                  # Not used with sqlite3.
+        'HOST': db_host,                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    }
+}
+
+

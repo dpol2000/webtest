@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.db import connection
-
 from django import VERSION as django_version
 
 if django_version[1] < 6:
@@ -13,9 +11,10 @@ else:
 
 QUESTION_TYPE = ((u'Один', u'Один правильный ответ'), (u'Несколько', u'Несколько правильных ответов'), (u'Свой', 'Свой ответ'))
 
+
 class Student(models.Model):
     
-    courses = models.ManyToManyField('Course', null = True)
+    courses = models.ManyToManyField('Course', null=True)
     croco = models.BooleanField(default=True)
     facebook_id = models.BigIntegerField(null=True, blank=True)
     user = models.OneToOneField(User)
@@ -36,8 +35,8 @@ class Student(models.Model):
             for test in course.test_set.all():
                 tat.append({'test': test, 
                     'testlogs': test.get_testlogs_by_student(self), 
-                    'best_result': TestLog.objects.filter(test=test, student = self).aggregate(models.Max('result'))['result__max'],
-                    'mean_result': TestLog.objects.filter(test=test, student = self).aggregate(models.Avg('result'))['result__avg'],
+                    'best_result': TestLog.objects.filter(test=test, student=self).aggregate(models.Max('result'))['result__max'],
+                    'mean_result': TestLog.objects.filter(test=test, student=self).aggregate(models.Avg('result'))['result__avg'],
                     'last_result': test.get_last_result_by_student(self),
                 })
             
@@ -104,20 +103,17 @@ class Test(models.Model):
         return TestLog.objects.filter(test=self)
 
     def get_testlogs_by_student(self, student):
-        return list(TestLog.objects.filter(test=self, student = student))
-
+        return list(TestLog.objects.filter(test=self, student=student))
 
 #    def get_best_result_by_student(self, student):
 #        return TestLog.objects.filter(test=self, student = student).aggregate(models.Max('result'))['result__max']
 
-
 #    def get_mean_result_by_student(self, student):
 #        return TestLog.objects.filter(test=self, student = student).aggregate(models.Avg('result'))['result__avg']
 
-
     def get_last_result_by_student(self, student):
 
-        testlogs = TestLog.objects.filter(test=self, student = student).order_by('-time')
+        testlogs = TestLog.objects.filter(test=self, student=student).order_by('-time')
 
         if testlogs:
             return testlogs[0].result
@@ -146,6 +142,7 @@ class Question(models.Model):
 #        cursor.execute("SELECT id, body, question_id FROM etest_answer WHERE question_id=%s ORDER BY RANDOM()", [self.id])
 #        res = list(cursor.fetchall())
 #        return res
+
 
 class Answer(models.Model):
     body = models.TextField()
@@ -177,7 +174,7 @@ class TestLog(models.Model):
     def get_qlogs(self):
         return list(QuestionLog.objects.filter(tlog=self))
 
-   
+
 class QuestionLog(models.Model):
     question = models.ForeignKey(Question)
     tlog = models.ForeignKey(TestLog)
@@ -192,6 +189,7 @@ class QuestionLog(models.Model):
     def get_alog_answers(self):
         return [alog.answer.id for alog in AnswerLog.objects.filter(qlog=self)]
 #        return AnswerLog.objects.filter(qlog=self)
+
 
 class AnswerLog(models.Model):
     answer = models.ForeignKey(Answer)
