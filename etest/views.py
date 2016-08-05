@@ -9,13 +9,13 @@ from django.template.response import TemplateResponse
 from django.contrib import auth
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
-from django import VERSION as django_version
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView, View
 from django.views.decorators.http import last_modified, require_GET, require_POST
 
 from models import Student, Test, Question, Answer, TestLog, QuestionLog, AnswerLog
+
 
 class StudentStatsView(DetailView):
     """ A particular test statistics view """
@@ -69,9 +69,11 @@ class StudentDetailView(DetailView):
     context_object_name = 'student'
     queryset = Student.objects.all()
 
+
 class TestLogDetailView(DetailView):
     context_object_name = 'testlog'
     queryset = TestLog.objects.all()
+
 
 class IndexView(View):
     """ The index view """
@@ -126,6 +128,7 @@ class TestLogList(ListView):
             return super(TestLogList, self).dispatch(request, *args, **kwargs)
         return _dispatch(request, *args, **kwargs)
 
+
 @require_GET
 def logout(request):
     """ Logs the user out """
@@ -142,6 +145,7 @@ def normalize(string):
         string2 = string
     return string2.replace(" ", "").upper()
 
+
 @csrf_exempt
 def getdata(request):
 
@@ -151,6 +155,7 @@ def getdata(request):
     results = [testlog.result for testlog in testlogs if testlog.result != None]
 
     return HttpResponse(results)
+
 
 @csrf_exempt
 def check_ajax(request):
@@ -278,6 +283,7 @@ def lts(request):
 
     return redirect(student) # HttpResponseRedirect('/students/' + str(student.id))
 
+
 @csrf_exempt
 def croco(request):
     """ Delete the croco """
@@ -287,6 +293,7 @@ def croco(request):
             student.croco = False
             student.save()
     return HttpResponse('ok')
+
 
 @require_POST
 def check(request):
