@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.contrib.auth.models import User
-from django.db import connection
-from django import VERSION as django_version
-
-if django_version[1] < 6:
-    from django.utils.safestring import mark_safe
-else:
-    from django.utils.html import format_html
+from django.utils.html import format_html
 
 QUESTION_TYPE = ((u'Один', u'Один правильный ответ'), (u'Несколько', u'Несколько правильных ответов'), (u'Свой', 'Свой ответ'))
 
@@ -40,7 +34,7 @@ class Student(models.Model):
                     'last_result': test.get_last_result_by_student(self),
                 })
             
-            ctl.append({'course': course, 'tests_and_testlogs': tat })
+            ctl.append({'course': course, 'tests_and_testlogs': tat})
 
         return ctl
 
@@ -54,10 +48,7 @@ class Course(models.Model):
         return self.name
 
     def XML(self):
-        if django_version[1] < 4:
-            return mark_safe('<a href="/get_xml?course_id=%s">Сохранить XML</a>' % self.id)
-        else:
-            return format_html('<a href="/get_xml?course_id=%s">Сохранить XML</a>' % self.id)
+        return format_html('<a href="/get_xml?course_id=%s">Сохранить XML</a>' % self.id)
 
     XML.allow_tags = True
 
@@ -78,10 +69,7 @@ class Test(models.Model):
         return self.name
 
     def XML(self):
-        if django_version[1] < 4:
-            return mark_safe('<a href="/get_xml?test_id=%s">Сохранить XML</a>' % self.id)
-        else:
-            return format_html('<a href="/get_xml?test_id=%s">Сохранить XML</a>' % self.id)
+        return format_html('<a href="/get_xml?test_id=%s">Сохранить XML</a>' % self.id)
 
     XML.allow_tags = True
 
@@ -96,7 +84,6 @@ class Test(models.Model):
         for q in qq:
             q.answers = [answer for answer in answers if answer['question_id'] == q.id]
 
-        #qq.kkd = 'kkd'
         return qq
 
     def get_testlogs(self):
@@ -150,7 +137,7 @@ class Answer(models.Model):
     question = models.ForeignKey(Question)
     position = models.PositiveIntegerField(null=True)
 
-    def __unicode__(self):  # Python 3: def __str__(self):
+    def __unicode__(self):
         return self.body
 
     class Meta:
@@ -197,4 +184,3 @@ class AnswerLog(models.Model):
 
     def __unicode__(self): 
         return self.answer.body
-

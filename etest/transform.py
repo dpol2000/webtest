@@ -1,12 +1,11 @@
 ﻿# -*- coding: utf-8 -*-
 
 from xml.dom.minidom import parseString
-
-from models import Course, Student, Test, Question, Answer
-
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_GET, require_POST
+from models import Course, Student, Test, Question, Answer
+
 
 @require_GET
 def get_xml(request):
@@ -54,6 +53,7 @@ def get_xml(request):
     
     return HttpResponse("error")
 
+
 def parseXMLanswer(xmlanswer, question, position=0):
 
     correct_str = xmlanswer.getAttribute('correct')
@@ -65,6 +65,7 @@ def parseXMLanswer(xmlanswer, question, position=0):
     answer = Answer(body=body, position=position, question=question, is_correct=correct)
     answer.save()
     return answer
+
 
 def parseXMLquestion(xmlquestion, test, position=0):
     qbody = xmlquestion.getAttribute('content')
@@ -80,6 +81,7 @@ def parseXMLquestion(xmlquestion, test, position=0):
     question.save()
     return question
 
+
 def parseXMLtest(xmltest, user, course=None, num=0):
     testName = xmltest.getAttribute('name')
     desc = xmltest.getAttribute('desc')
@@ -89,6 +91,7 @@ def parseXMLtest(xmltest, user, course=None, num=0):
     test.save()
     return test
 
+
 def uploadfile(request, filename):
     """ Returns data from request file """
     try:
@@ -97,6 +100,7 @@ def uploadfile(request, filename):
     except:
         return None
     return data
+
 
 @require_POST
 def uploadxmltest(request):
@@ -160,6 +164,7 @@ def uploadxmltest(request):
 
     return TemplateResponse(request, 'upload.html', {'result': result})
 
+
 @require_POST
 def uploadxmlcourse(request):
     """ Uploads a course in the XML format and converts it into objects """
@@ -214,6 +219,7 @@ def uploadxmlcourse(request):
 
 #    return HttpResponseRedirect('/admin')
     return TemplateResponse(request, 'upload.html', {'result': result})
+
 
 # outdated!
 def upload(request):

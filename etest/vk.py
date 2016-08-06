@@ -43,8 +43,8 @@ def authorize(request):
         user = User(
             username=username,
             email=username,
-            first_name = first_name[:30],
-            last_name = last_name[:30],
+            first_name=first_name[:30],
+            last_name=last_name[:30],
             is_staff=False,
             is_active=True,
             is_superuser=False,
@@ -54,7 +54,6 @@ def authorize(request):
         user.set_password(password)
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         user.save()
-
         student = Student(user=user, facebook_id='123')
         student.save()
 

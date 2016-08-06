@@ -2,14 +2,11 @@
 
 from models import Course, Student, Test, Question, Answer
 
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 
-
-from xml.dom.minidom import Document
-from lxml import etree
 
 def get_xml(request):
 
@@ -18,12 +15,12 @@ def get_xml(request):
 
         course = Course.objects.get(pk=course_id)
 
-        course.tests = list(Test.objects.filter(course = course))
+        course.tests = list(Test.objects.filter(course=course))
 
         for test in course.tests: 
-            test.questions = list(Question.objects.filter(test = test))
+            test.questions = list(Question.objects.filter(test=test))
             for q in test.questions:
-                q.answers = list(Answer.objects.filter(question = q))
+                q.answers = list(Answer.objects.filter(question=q))
 
         response = TemplateResponse(request, 'course-template.xml', { 'course': course }, 'application/x-generated-xml-backup')
 
@@ -45,41 +42,11 @@ def get_xml(request):
             q.answers = list(Answer.objects.filter(question=q))
 
         response = TemplateResponse(request, 'test-template.xml', { 'test': test }, 'application/x-generated-xml-backup')
-
         response['Content-disposition'] = 'attachment; filename=test-' + str(test_id) + '.xml'
 
-
         return response
+
     return HttpResponse("error")
-
-
-def serialize_old(request):
-
-    if request.method == 'GET':
-
-#        if 'id' in request.GET:
-#            course_id = int(request.GET['id'])
-
-        try:
-            tests = Test.objects.filter(course__pk=42)
-        except:
-            return HttpResponse('exception')
-
-        class Croco:
-            pass
-
-        crocos = []
-
-        for test in tests:
-            kkd = Croco()
-            kkd.name = test.name
-            crocos.append(kkd)
-
-        data = serializers.serialize("xml", crocos)
-
-        return HttpResponse(data)
-
-    return HttpResponse('error')
 
 
 @csrf_exempt
@@ -113,6 +80,7 @@ def serializecourse(request):
         return HttpResponse('ok')
     else:
         return HttpResponse('error')
+
 
 def serializetest(request):
 
