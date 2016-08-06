@@ -15,5 +15,5 @@ urlpatterns = patterns('',
     url(r'^uploadtest$', 'etest.transform.uploadxmltest'),
     url(r'^get_xml$', 'etest.transform.get_xml'),
     url(r'^vk.*$', 'etest.vk.authorize'),
-    url(r'^getstudentdata$', 'etest.views.getstudentdata'),
+    url(r'^getstudentdata$', 'etest.views.get_student_data'),
 )

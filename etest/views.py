@@ -9,7 +9,6 @@ from django.template.response import TemplateResponse
 from django.contrib import auth
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView, View
 from django.views.decorators.http import last_modified, require_GET, require_POST
@@ -31,7 +30,7 @@ class StudentStatsView(DetailView):
         return self.render_to_response(context)
 
 
-def getstudentdata(request):
+def get_student_data(request):
 
     student_id = int(request.GET['id'])
     student = Student.objects.get(id=student_id)
@@ -40,9 +39,11 @@ def getstudentdata(request):
     for course in student.courses.all():
         crs = {'course': course.name, 'tests': []}
         for test in course.test_set.all():
-            tst = {'test': test.name,
-                   'avg': TestLog.objects.filter(test=test, student=student).aggregate(models.Avg('result'))['result__avg'],
-                   'count': TestLog.objects.filter(test=test, student=student).count()}
+            tst = {
+                'test': test.name,
+                'avg': TestLog.objects.filter(test=test, student=student).aggregate(models.Avg('result'))['result__avg'],
+                'count': TestLog.objects.filter(test=test, student=student).count()
+            }
             crs['tests'].append(tst)
 
         courses.append(crs)
@@ -184,7 +185,7 @@ def check_ajax(request):
 
                             elif q.qtype == u'Несколько':
 
-                                answers = [Answer.objects.get(pk = int(i)) for i in question['answers']]
+                                answers = [Answer.objects.get(pk=int(i)) for i in question['answers']]
                                           
                                 all_correct = True
 
@@ -256,98 +257,7 @@ def lts(request):
 
     student.facebook_id = '123'
     student.save()
-
     user = auth.authenticate(username=username, password=password)
     auth.login(request, user)
+    return redirect(student)
 
-    return redirect(student) # HttpResponseRedirect('/students/' + str(student.id))
-
-
-@require_POST
-def check(request):
-    """ Check the test. Old version, not in use now """
-    if request.POST:
-        if request.method == 'POST':
-            if 'test_id' in request.POST:
-                test_id = int(request.POST['test_id'])
-                if test_id:
-                    test = Test.objects.get(pk=test_id)
-                    qlogs = []
-                    alogs = []
-                    true_answers = 0
-                    questions = Question.objects.filter(test=test)
-
-                    tlog = TestLog(test=test, student=Student.objects.get(user=request.user),
-                                   total_questions=test.actualNumberOfQuestions, correct_answers=0)
-                    tlog.save()
-
-                    qlog = None
-                    for question in questions:
-
-                        if 'question-'+str(question.id) in request.POST:
-
-                            qlog = QuestionLog(question=question, tlog=tlog, result=False)
-                            qlog.save()
-
-                            if question.qtype == u'Один':
-
-                                answer_id = int(request.POST['question-'+str(question.id)])
-                                answer = Answer.objects.get(pk=answer_id)
-                                alog = AnswerLog(qlog=qlog, answer=answer)
-                                alog.save()
-    
-                                alogs.append(alog)
-                                if answer.is_correct:
-                                    qlog.result = True                
-                                    true_answers = true_answers + 1
-
-                            elif question.qtype == u'Несколько':
-
-                                answers_id_list = request.POST.getlist('question-'+str(question.id), -1)
-                                answers = [Answer.objects.get(pk=x) for x in answers_id_list]
-                                          
-                                true_flag = True
-                                count = 0 
-
-                                for answer in answers:
-                                    if answer.is_correct == False:
-                                        true_flag = False
-                                    alog = AnswerLog(qlog=qlog, answer=answer)
-                                    alog.save()
-                                    alogs.append(alog)
-                                    count = count + 1
- 
-                                correct_answers = Answer.objects.filter(question=question, is_correct=True)
-                             
-                                if true_flag and count == correct_answers.count():
-                                    qlog.result = True
-                                    true_answers = true_answers + 1
-
-                            elif question.qtype == u'Свой':
-                                ans = Answer.objects.filter(question=question, is_correct=True)
-                                answer = ans[0]
-
-                                if answer.body == request.POST['question-'+str(question.id)]:
-                                    new_answer = answer
-                                else:
-                                    new_answer = Answer(body=request.POST['question-' + str(question.id)],
-                                                        question=question, is_correct=False)
-                                    new_answer.save()
-                    
-                                alog = AnswerLog(qlog=qlog, answer=new_answer)
-                                alog.save()
-                                alogs.append(alog)
-                                if new_answer.is_correct:
-                                    qlog.result = True                
-                                    true_answers = true_answers + 1
-
-                        if qlog:
-                            qlog.save()
-                            qlogs.append(qlog)
-            
-                        tlog.correct_answers = true_answers
-                        tlog.total_questions = test.actualNumberOfQuestions
-                        tlog.result = 100* tlog.correct_answers / tlog.total_questions
-                        tlog.save()
-
-    return HttpResponseRedirect('students/results/' + str(tlog.id))
