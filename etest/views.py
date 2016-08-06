@@ -31,7 +31,6 @@ class StudentStatsView(DetailView):
         return self.render_to_response(context)
 
 
-@csrf_exempt
 def getstudentdata(request):
 
     student_id = int(request.GET['id'])
@@ -138,16 +137,6 @@ def logout(request):
     return HttpResponseRedirect('/')
 
 
-@csrf_exempt
-def getdata(request):
-
-    test = Test.objects.get(id=23)
-    testlogs = TestLog.objects.filter(test=test)
-    results = [testlog.result for testlog in testlogs if testlog.result is not None]
-    return HttpResponse(results)
-
-
-@csrf_exempt
 def check_ajax(request):
     """ Check the test, ajax version """
 

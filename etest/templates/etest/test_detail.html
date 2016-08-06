@@ -78,37 +78,39 @@
 
             var n;
 
+            var $question_selector = $('#qp-' + i);
+
             if ($(name).attr('type') == 'text') {
                 n = $(name).val().length;
 
             } else
                 n = $(name + ":checked").length;
+
             if (n==0) {
+
                 if ($(name).length > 1) {
-                    $('#qp-' + i).removeClass('panel-default');
-                    $('#qp-' + i).addClass('panel-danger');
+                    $question_selector.removeClass('panel-default');
+                    $question_selector.addClass('panel-danger');
                     ok = false;
                 }
                 else {
                     if (!$(name).first().val()) {
-                        $('#qp-' + i).removeClass('panel-default');
-                        $('#qp-' + i).addClass('panel-danger');
+                        $question_selector.removeClass('panel-default');
+                        $question_selector.addClass('panel-danger');
                         ok = false;
                     }
                     else {
-                        if ($('#qp-' + i).hasClass('panel-danger')) {
-                            $('#qp-' + i).removeClass('panel-danger');
-                            $('#qp-' + i).addClass('panel-default');
+                        if ($question_selector.hasClass('panel-danger')) {
+                            $question_selector.removeClass('panel-danger');
+                            $question_selector.addClass('panel-default');
                         }
                     }
                 }   
             }
             else {
-                $('#qp-' + i).removeClass('panel-danger');
-                $('#qp-' + i).addClass('panel-default');
-
+                $question_selector.removeClass('panel-danger');
+                $question_selector.addClass('panel-default');
             }
-
         }
 
        if (ok) {
@@ -126,57 +128,91 @@
 
 
     function getTestData() {
-            var test = { 'id': $('#test_id').val() }
+        var test = { 'id': $('#test_id').val() };
 
-            var questions = [];
-            for (var i=1; i <= $('.question').length; i++) {
-                var answers = [];
-                var question = { id: '', answers: []};
-                question.id = $('#qp-' + i).attr('qid');
-                
-                for (var j=1; j <= $('.q-' + i).length; j++) {
-                    var answer = $('.q-' +i + '#a-' + j)
-                    switch (answer.attr('type')) {
-                        case 'radio':
-                            if (answer.prop('checked') == true) {
-                                answers.push(answer.val());
-                                break;
-                            }
-                            break;
+        var questions = [];
+        for (var i=1; i <= $('.question').length; i++) {
+            var answers = [];
+            var question = { id: '', answers: []};
+            question.id = $('#qp-' + i).attr('qid');
 
-                        case 'checkbox':
-                            if (answer.prop('checked') == true) {
-                                answers.push(answer.val());
-                            }
-                            break;
-
-                        case 'text':
+            for (var j=1; j <= $('.q-' + i).length; j++) {
+                var answer = $('.q-' +i + '#a-' + j)
+                switch (answer.attr('type')) {
+                    case 'radio':
+                        if (answer.prop('checked') === true) {
                             answers.push(answer.val());
-                            console.log(answer.val());
                             break;
-                    }
+                        }
+                        break;
+
+                    case 'checkbox':
+                        if (answer.prop('checked') === true) {
+                            answers.push(answer.val());
+                        }
+                        break;
+
+                    case 'text':
+                        answers.push(answer.val());
+                        console.log(answer.val());
+                        break;
                 }
-                question.answers = answers;
-                questions.push(question);
             }
-            test.questions = questions;
+            question.answers = answers;
+            questions.push(question);
+        }
+        test.questions = questions;
 //            console.log(test);
-            return test;
+        return test;
 
     }
 
 
+    // using jQuery
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
     function sendTestData(testData) {
-            $.post('/checktest_ajax', {'test': JSON.stringify({'test': testData})}, function(data) {
-                document.location = '/students/results/' + data;
-            })
-              .fail(function() {
-                GSound.playSound(2);
-                $('#modalWait').modal('hide');
-                alert( "Возникла ошибка при обработке результатов." );
-              })
-              .always(function() {
-            }, "json");
+
+        var csrftoken = getCookie('csrftoken');
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        $.post('/checktest_ajax', {'test': JSON.stringify({'test': testData})}, function(data) {
+            document.location = '/students/results/' + data;
+        })
+          .fail(function() {
+            GSound.playSound(2);
+            $('#modalWait').modal('hide');
+            alert("Возникла ошибка при обработке результатов.");
+          })
+          .always(function() {
+        }, "json");
     }
 
     </script>
