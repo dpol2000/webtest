@@ -19,15 +19,15 @@ INSTALLED_APPS = (
     #'debug_toolbar'
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-#    'django.middleware.gzip.GZipMiddleware',
-)
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
+]
 
 ROOT_URLCONF = 'webtest.urls'
 
@@ -48,14 +48,22 @@ USE_L10N = True
 
 USE_TZ = True
 
-TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': ['django.contrib.auth.context_processors.auth']
+        },
+    },
+]
 
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader')
 
 if socket.gethostbyaddr(socket.gethostname())[2][0] == '127.0.1.1':
     from settings_local import *
+
+    TEMPLATES[0]['OPTIONS']['debug'] = True
 
     db_name = get_config_key("DB_NAME_LOCAL", config_keys)
     db_user = get_config_key("DB_USER_LOCAL", config_keys)
@@ -64,6 +72,8 @@ if socket.gethostbyaddr(socket.gethostname())[2][0] == '127.0.1.1':
 
 else:
     from settings_remote import *
+
+    TEMPLATES[0]['OPTIONS']['debug'] = False
 
     db_name = get_config_key("DB_NAME_REMOTE", config_keys)
     db_user = get_config_key("DB_USER_REMOTE", config_keys)
