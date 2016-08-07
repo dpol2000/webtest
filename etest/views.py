@@ -12,12 +12,14 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView, View
 from django.views.decorators.http import last_modified, require_GET, require_POST
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 from models import Student, Test, Question, Answer, TestLog, QuestionLog, AnswerLog
 from utils import normalize
 
 
-class StudentStatsView(DetailView):
+class StudentStatsView(LoginRequiredMixin, DetailView):
     """ A particular test statistics view """
     context_object_name = 'student'
     queryset = Student.objects.all()
@@ -51,7 +53,7 @@ def get_student_data(request):
     return HttpResponse(json.dumps(courses))
 
 
-class TestStatsView(DetailView):
+class TestStatsView(LoginRequiredMixin, DetailView):
     """ A particular student statistics view """
     context_object_name = 'test'
     queryset = Test.objects.all()
@@ -65,12 +67,12 @@ class TestStatsView(DetailView):
         return self.render_to_response(context)
 
         
-class StudentDetailView(DetailView):
+class StudentDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'student'
     queryset = Student.objects.all()
 
 
-class TestLogDetailView(DetailView):
+class TestLogDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'testlog'
     queryset = TestLog.objects.all()
 
@@ -100,7 +102,7 @@ class IndexView(View):
         return render(request, self.template_name, {'local': local})
 
 
-class TestDetailView(DetailView):
+class TestDetailView(LoginRequiredMixin, DetailView):
     
     """ A particular test view """
     
@@ -108,7 +110,7 @@ class TestDetailView(DetailView):
     queryset = Test.objects.all()
 
 
-class TestLogList(ListView):
+class TestLogList(LoginRequiredMixin, ListView):
     
     """ List of testlogs, for admin """
     

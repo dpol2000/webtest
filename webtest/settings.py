@@ -38,6 +38,8 @@ STATICFILES_DIRS = (
     "/usr/local/lib/python2.7/dist-packages/django/contrib/admin/static/admin/",
 )
 
+LOGIN_URL = '/'
+
 LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'Europe/Moscow'
