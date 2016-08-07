@@ -1,4 +1,5 @@
 import os
+import sys
 import socket
 from config import get_config, get_config_key
 
@@ -62,7 +63,7 @@ TEMPLATES = [
 ]
 
 
-if socket.gethostbyaddr(socket.gethostname())[2][0] == '127.0.1.1':
+if 'manage.py' in sys.argv[0]:
     from settings_local import *
 
     TEMPLATES[0]['OPTIONS']['debug'] = True
