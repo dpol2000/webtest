@@ -14,7 +14,6 @@ from django.views.generic import DetailView, ListView, View
 from django.views.decorators.http import last_modified, require_GET, require_POST
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-
 from models import Student, Test, Question, Answer, TestLog, QuestionLog, AnswerLog
 from utils import normalize
 
@@ -60,10 +59,9 @@ class TestStatsView(LoginRequiredMixin, DetailView):
     template_name = 'etest/test_stats.html'
 
     def get(self, request, *args, **kwargs):
-
-        self.object = self.get_object()
+        obj = self.get_object()
         context = self.get_context_data()
-        context['testlogs'] = TestLog.objects.filter(test=self.object)
+        context['testlogs'] = TestLog.objects.filter(test=obj)
         return self.render_to_response(context)
 
         
@@ -103,7 +101,6 @@ class IndexView(View):
 
 
 class TestDetailView(LoginRequiredMixin, DetailView):
-    
     """ A particular test view """
     
     context_object_name = 'test'
