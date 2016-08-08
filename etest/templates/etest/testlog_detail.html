@@ -106,7 +106,7 @@
          </div>
 
              </div>
-        <button class="btn btn-default" onclick="$('#modalWait').show(); document.location='/students/{{testlog.student.id}}'">Вернуться к списку тестов</button>
+        <button class="btn btn-default" onclick="$('#modalWait').show(); document.location='{% url 'student' testlog.student.id %}'">Вернуться к списку тестов</button>
 
     </div>
 

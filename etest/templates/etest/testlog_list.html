@@ -31,7 +31,7 @@
                                 <tr class="success">
                                 {% endif %}
                                     <td>{{ testlog.student.user.get_full_name }}</td>
-                                    <td align="left"><a href="/students/results/{{testlog.id}}">{{ testlog.test.name }}</a></td>
+                                    <td align="left"><a href="{% url 'testlog' testlog.id %}">{{ testlog.test.name }}</a></td>
                                     <td align="center">{{ testlog.result }}</td>
                                     <td align="left">{{ testlog.time|date:"d E Y г. H:i" }}</td>
                                 </tr>

@@ -4,10 +4,10 @@ from etest import views, transform, vk
 urlpatterns = [
     url(r'^$', views.IndexView.as_view()),
     url(r'^stats/students/(?P<pk>\d+)', views.StudentStatsView.as_view()),
-    url(r'^students/(?P<pk>\d+)', views.StudentDetailView.as_view()),
+    url(r'^students/(?P<pk>\d+)', views.StudentDetailView.as_view(), name='student'),
     url(r'^students/results/$', views.TestLogList.as_view()),
-    url(r'^students/results/(?P<pk>\d+)', views.TestLogDetailView.as_view()),
-    url(r'^students/tests/(?P<pk>\d+)', views.TestDetailView.as_view()),
+    url(r'^students/results/(?P<pk>\d+)', views.TestLogDetailView.as_view(), name='testlog'),
+    url(r'^students/tests/(?P<pk>\d+)', views.TestDetailView.as_view(), name='test'),
     url(r'^login-test-student$', views.lts),
     url(r'^logout$', views.logout),
     url(r'^checktest_ajax$', views.check_ajax),

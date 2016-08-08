@@ -42,7 +42,7 @@
                                     <td align="center">{{tl.best_result|default_if_none:"-"}}</td>
                                     <td align="center">{{tl.last_result|default_if_none:"-"}}</td>
                                     <td>
-                                        <button type="button" class="btn btn-default" onclick="$('#modalWait').modal({}); document.location='tests/{{tl.test.id}}'"
+                                        <button type="button" class="btn btn-default" onclick="$('#modalWait').modal({}); document.location='{% url 'test' tl.test.id %}'"
                                     {% if user != student.user %}disabled{% endif %}>Пройти тест</button>
                                     </td>
                                     {% if tl.testlogs %}
@@ -67,7 +67,7 @@
                                                 {% endif %}        
                                                      <td width="200">{{ forloop.counter }}.&nbsp;{{ testlog.time|date:"d E Y г. H:i" }}</td>
                                                      <td>{{ testlog.result }}&nbsp;%</td>
-                                                     <td style="background: #FFFFFF"><button class="btn btn-default" style="margin-left: 15px" onclick='document.location="/students/results/{{testlog.id}}"'>Посмотреть</button></td>
+                                                     <td style="background: #FFFFFF"><button class="btn btn-default" style="margin-left: 15px" onclick='document.location="{% url 'testlog' testlog.id %}"'>Посмотреть</button></td>
                                             </tr>
                                         {% endfor %}
                                         </table>
