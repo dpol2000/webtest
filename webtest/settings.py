@@ -63,7 +63,7 @@ TEMPLATES = [
 ]
 
 
-if run_on_dev_machine:
+if run_on_dev_machine():
     from settings_local import *
 
     TEMPLATES[0]['OPTIONS']['debug'] = True
