@@ -15,7 +15,7 @@ from django.views.decorators.http import last_modified, require_GET, require_POS
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from models import Student, Test, Question, Answer, TestLog, QuestionLog, AnswerLog
-from utils import normalize
+from utils import normalize, run_on_dev_machine
 
 
 class StudentStatsView(LoginRequiredMixin, DetailView):
@@ -86,10 +86,7 @@ class IndexView(View):
         to index otherwise
         """
 
-        if socket.gethostname() == 'hrutr':
-            local = True
-        else:
-            local = False
+        local = run_on_dev_machine()
 
         if not local:
             if request.user.is_authenticated():
