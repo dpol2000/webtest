@@ -1,6 +1,6 @@
 import os
-import sys
 import socket
+from etest.utils import run_on_dev_machine
 from config import get_config, get_config_key
 
 
@@ -63,7 +63,7 @@ TEMPLATES = [
 ]
 
 
-if 'manage.py' in sys.argv[0]:
+if run_on_dev_machine:
     from settings_local import *
 
     TEMPLATES[0]['OPTIONS']['debug'] = True
