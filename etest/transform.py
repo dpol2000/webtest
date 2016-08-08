@@ -103,7 +103,7 @@ def uploadfile(request, filename):
 
 
 @require_POST
-def uploadxmltest(request):
+def upload_xml_test(request):
     """ Uploads a test in the XML format and converts it into objects """
 
     result = ''
@@ -166,7 +166,7 @@ def uploadxmltest(request):
 
 
 @require_POST
-def uploadxmlcourse(request):
+def upload_xml_course(request):
     """ Uploads a course in the XML format and converts it into objects """
 
     result = ''
