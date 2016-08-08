@@ -8,8 +8,7 @@ QUESTION_TYPE = ((u'Один', u'Один правильный ответ'), (u'
 
 class Student(models.Model):
     
-    courses = models.ManyToManyField('Course', null=True)
-    croco = models.BooleanField(default=True)
+    courses = models.ManyToManyField('Course')
     facebook_id = models.BigIntegerField(null=True, blank=True)
     user = models.OneToOneField(User)
     photo = models.CharField(max_length=100, null=True, blank=True)
