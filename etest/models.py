@@ -3,7 +3,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.html import format_html
 
-QUESTION_TYPE = ((u'Один', u'Один правильный ответ'), (u'Несколько', u'Несколько правильных ответов'), (u'Свой', 'Свой ответ'))
+QUESTION_TYPE = (
+    (u'Один', u'Один правильный ответ'),
+    (u'Несколько', u'Несколько правильных ответов'),
+    (u'Свой', 'Свой ответ')
+)
 
 
 class Student(models.Model):

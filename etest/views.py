@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
-
 import datetime
 import json
-import socket
-
 from django.db import models
-from django.template.response import TemplateResponse
 from django.contrib import auth
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView, View
-from django.views.decorators.http import last_modified, require_GET, require_POST
+from django.views.decorators.http import last_modified, require_GET
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from models import Student, Test, Question, Answer, TestLog, QuestionLog, AnswerLog
-from utils import normalize, run_on_dev_machine
+from .models import Student, Test, Question, Answer, TestLog, QuestionLog, AnswerLog
+from .utils import normalize, run_on_dev_machine
 
 
 class StudentStatsView(LoginRequiredMixin, DetailView):
@@ -59,9 +55,9 @@ class TestStatsView(LoginRequiredMixin, DetailView):
     template_name = 'etest/test_stats.html'
 
     def get(self, request, *args, **kwargs):
-        obj = self.get_object()
+        self.object = self.get_object()
         context = self.get_context_data()
-        context['testlogs'] = TestLog.objects.filter(test=obj)
+        context['testlogs'] = TestLog.objects.filter(test=self.object)
         return self.render_to_response(context)
 
         
