@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib import auth
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views.generic import DetailView, ListView, View
 from django.views.decorators.http import last_modified, require_GET
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -30,7 +30,8 @@ class StudentStatsView(LoginRequiredMixin, DetailView):
 def get_student_data(request):
 
     student_id = int(request.GET['id'])
-    student = Student.objects.get(id=student_id)
+
+    student = get_object_or_404(Student, pk=student_id)
     courses = []
 
     for course in student.courses.all():
@@ -224,7 +225,7 @@ def check_ajax(request):
                 return HttpResponse('Error: cannot convert test info from JSON')
         else:
             return HttpResponse('Error: cannot find test info in POST')
-    return HttpResponse('Error: not ajax call or not POST method')
+    return HttpResponse('Error: not ajax call or not a POST method')
 
 
 @require_GET

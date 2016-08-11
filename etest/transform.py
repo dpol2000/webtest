@@ -4,7 +4,8 @@ from xml.dom.minidom import parseString
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_GET, require_POST
-from models import Course, Student, Test, Question, Answer
+
+from .models import Course, Test, Question, Answer
 
 
 @require_GET

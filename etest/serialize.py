@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
-from models import Course, Student, Test, Question, Answer
+from .models import Course, Test, Question, Answer
 
 from django.http import HttpResponse
 from django.template.response import TemplateResponse

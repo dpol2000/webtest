@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
-from models import Student
+from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
+
+from .models import Student
 
 
 def authorize(request):
@@ -26,7 +30,7 @@ def authorize(request):
     photo = str(f3)
 
     fname = first_name + '_' + last_name
-    if len(fname)<22:
+    if len(fname) < 22:
         username = fname + '@vk.com'
     else:
         username = fname[:22] + '@vk.com'
@@ -69,7 +73,10 @@ def authorize(request):
     if user is not None:
         if user.is_active:
             auth.login(request, user)
-            return HttpResponseRedirect('/students/' + str(student.id))
+
+            return redirect(student)
+            #  return HttpResponseRedirect(reverse('student', args=(student.id,)))
+            #  return HttpResponseRedirect('/students/' + str(student.id))
         else:
             return HttpResponse('Login is invalid.')
 
