@@ -90,12 +90,9 @@
                 return 'green';
             }
 
-
 //            drawStuff();
 
-            $.get('/getstudentdata', {'id': '{{ student.id }}'}, function(data){
-
-                var courses = JSON.parse(data);
+            $.get('/getstudentdata', {'id': '{{ student.id }}'}, function(courses){
 
                 $('#modalWait').modal('hide');
 

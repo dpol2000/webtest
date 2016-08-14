@@ -38,9 +38,9 @@
                             {% endif %}
                                     <td>{{ tl.test.name }}</td>
                                     <td align="center">{{ tl.testlogs|length }}</td>
-                                    <td align="center">{{tl.mean_result|floatformat:"0"|default:"-"}}</td>
-                                    <td align="center">{{tl.best_result|default_if_none:"-"}}</td>
-                                    <td align="center">{{tl.last_result|default_if_none:"-"}}</td>
+                                    <td align="center">{{ tl.mean_result|floatformat:"0"|default:"-" }}</td>
+                                    <td align="center">{{ tl.best_result|default_if_none:"-" }}</td>
+                                    <td align="center">{{ tl.last_result|default_if_none:"-" }}</td>
                                     <td>
                                         <button type="button" class="btn btn-default" onclick="$('#modalWait').modal({}); document.location='{% url 'test' tl.test.id %}'"
                                     {% if user != student.user %}disabled{% endif %}>Пройти тест</button>

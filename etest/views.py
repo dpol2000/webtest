@@ -3,11 +3,11 @@ import datetime
 import json
 from django.db import models
 from django.contrib import auth
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.generic import DetailView, ListView, View
-from django.views.decorators.http import last_modified, require_GET
+from django.views.decorators.http import last_modified, require_GET, require_POST
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Student, Test, Question, Answer, TestLog, QuestionLog, AnswerLog
@@ -26,27 +26,30 @@ class StudentStatsView(LoginRequiredMixin, DetailView):
         context['courses'] = self.object.courses.all()
         return self.render_to_response(context)
 
-
+@require_GET
 def get_student_data(request):
 
-    student_id = int(request.GET['id'])
+    if request.is_ajax():
 
-    student = get_object_or_404(Student, pk=student_id)
-    courses = []
+        student_id = int(request.GET.get('id'))
 
-    for course in student.courses.all():
-        crs = {'course': course.name, 'tests': []}
-        for test in course.test_set.all():
-            tst = {
-                'test': test.name,
-                'avg': TestLog.objects.filter(test=test, student=student).aggregate(models.Avg('result'))['result__avg'],
-                'count': TestLog.objects.filter(test=test, student=student).count()
-            }
-            crs['tests'].append(tst)
+        student = get_object_or_404(Student, pk=student_id)
+        courses = []
 
-        courses.append(crs)
+        for course in student.courses.all():
+            crs = {'course': course.name, 'tests': []}
+            for test in course.test_set.all():
+                tst = {
+                    'test': test.name,
+                    'avg': TestLog.objects.filter(test=test, student=student).aggregate(models.Avg('result'))['result__avg'],
+                    'count': TestLog.objects.filter(test=test, student=student).count()
+                }
+                crs['tests'].append(tst)
 
-    return HttpResponse(json.dumps(courses))
+            courses.append(crs)
+
+        return JsonResponse(courses, safe=False)
+    return HttpResponseRedirect('/')
 
 
 class TestStatsView(LoginRequiredMixin, DetailView):
@@ -130,11 +133,11 @@ def logout(request):
         auth.logout(request)
     return HttpResponseRedirect('/')
 
-
+require_POST
 def check_ajax(request):
     """ Check the test, ajax version """
 
-    if request.is_ajax() and request.method == 'POST':
+    if request.is_ajax():
 
         # read test info from POST
         test = request.POST.get('test')
@@ -221,11 +224,7 @@ def check_ajax(request):
                     tlog.save()
 
                     return HttpResponse(str(tlog.id))
-            else:
-                return HttpResponse('Error: cannot convert test info from JSON')
-        else:
-            return HttpResponse('Error: cannot find test info in POST')
-    return HttpResponse('Error: not ajax call or not a POST method')
+    return HttpResponse(status_code=500)
 
 
 @require_GET

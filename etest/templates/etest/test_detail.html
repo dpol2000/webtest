@@ -4,9 +4,7 @@
 
 {% block content %}
 
-<!--    <form method="post" action="/checktest" onsubmit="return validate();">{% csrf_token %} -->
-
-    <input type="hidden" name="test_id" id="test_id" value="{{test.id}}">
+    <input type="hidden" name="test_id" id="test_id" value="{{ test.id }}">
 
     <div class="panel panel-default">
 
@@ -17,7 +15,7 @@
             <div class="panel-body">
 
             {% for question in test.get_actual_questions %}
-            <div class="panel panel-default question" id="qp-{{forloop.counter}}" qid="{{ question.id }}">
+            <div class="panel panel-default question" id="qp-{{ forloop.counter }}" qid="{{ question.id }}">
                 <div class="panel-heading">{{ forloop.counter }}. {{ question.qbody }}</div>
                 <div class="panel-body">
                 {% if question.qtype == 'Один' %}
@@ -25,7 +23,7 @@
 
                     <div class="radio">    
                       <label>
-                        <input type="radio" name="question-{{ question.id }}" value="{{ answer.id }}" class="q-{{forloop.parentloop.counter}}" id="a-{{ forloop.counter }}">
+                        <input type="radio" name="question-{{ question.id }}" value="{{ answer.id }}" class="q-{{ forloop.parentloop.counter }}" id="a-{{ forloop.counter }}">
                             {{ answer.body }}
                         </label>
                     </div>
@@ -35,7 +33,7 @@
                     {% for answer in question.answers %}
                     <div class="checkbox">    
                       <label>
-                        <input type="checkbox" name="question-{{ question.id }}" value="{{ answer.id }}" class="q-{{forloop.parentloop.counter}}" id="a-{{ forloop.counter }}">
+                        <input type="checkbox" name="question-{{ question.id }}" value="{{ answer.id }}" class="q-{{ forloop.parentloop.counter }}" id="a-{{ forloop.counter }}">
                             {{ answer.body }}
                         </label>
                     </div>
@@ -43,7 +41,7 @@
 
                 {% elif question.qtype == 'Свой' %}
 
-                    <input type="text" class="form-control q-{{forloop.counter}}" placeholder="Введите ответ" name="question-{{ question.id }}" id="a-1">
+                    <input type="text" class="form-control q-{{ forloop.counter }}" placeholder="Введите ответ" name="question-{{ question.id }}" id="a-1">
 
                 {% endif %}
             </div>
@@ -60,10 +58,6 @@
 <!--    </form> -->
    
     </div>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://code.jquery.com/jquery.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="/static/etest/bootstrap/js/bootstrap.min.js"></script>
 
     <script>
     function validate() {
