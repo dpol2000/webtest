@@ -1,4 +1,6 @@
 from django.conf.urls import url
+from django.contrib import admin
+
 from etest import views, transform, vk
 
 urlpatterns = [
@@ -16,4 +18,5 @@ urlpatterns = [
     url(r'^get_xml$', transform.get_xml),
     url(r'^vk.*$', vk.authorize),
     url(r'^getstudentdata$', views.get_student_data),
+    url(r'^admin/', admin.site.urls),
 ]
